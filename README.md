@@ -1,5 +1,5 @@
-# MATH517team2-2
-## Project 2:
+# MATH517team2-3
+## Project 3:
 ### Project on TBD:
 
 Brainstorming:
