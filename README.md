@@ -9,10 +9,11 @@ Brainstorming: https://docs.google.com/document/d/1t1TRSdXrubLFedwC9bPvZH0JIvguA
 
 ### Possible questions
 - Are older planes more likely to crash? (Matias)
-- Instruction flights causing severe damages?
+- Instruction flights causing severe damages? (Selima)
 - Map visualization, states with more accidents? (@Fahim: please let me work on maps :sob:)
 - Barplot through time: increase, decrease or constant number of accidents?
 - Different factors that may cause the accidents (Seorim)
+- 
 
 
 ## List of members
