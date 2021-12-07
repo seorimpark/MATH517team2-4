@@ -1,6 +1,6 @@
 # MATH517team2-4
-## Project 4:
-### Project on Brazilian Aeronautics Accidents:
+## Project 4
+### Project on Brazilian Aeronautics Accidents
 
 ### Useful links
 Data description: https://www.kaggle.com/paulovasconcellos/aeronautics-accidents-in-brazil \
@@ -14,7 +14,7 @@ Brainstorming: https://docs.google.com/document/d/1t1TRSdXrubLFedwC9bPvZH0JIvguA
 - Barplot through time: increase, decrease or constant number of accidents?
 
 
-## List of members:
+## List of members
 - Zineb Agnaou (ZinebAg)
 - Fahim Beck (FahimBeck)
 - Matias Janvin (matiasjanvin)
