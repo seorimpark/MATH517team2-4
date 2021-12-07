@@ -11,7 +11,7 @@ Brainstorming: https://docs.google.com/document/d/1t1TRSdXrubLFedwC9bPvZH0JIvguA
 - Are older planes more likely to crash? (Matias)
 - Instruction flights causing severe damages? (Selima)
 - Map visualization, states with more accidents? (@Fahim: please let me work on maps :sob:)
-- Barplot through time: increase, decrease or constant number of accidents?
+- Barplot through time: increase, decrease or constant number of accidents?/Temporal analysis (Zineb)
 - Different factors that may cause the accidents (Seorim)
 - 
 
