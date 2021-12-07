@@ -1,7 +1,0 @@
-Aircrafts :
-- Are older planes more likely to crash ?
-- Instruction flights causing severe damages ?
-
-Occurences :
-- Map visualization 
-- Barplot through time (increase, decrease or constant)
