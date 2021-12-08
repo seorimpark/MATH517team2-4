@@ -1,18 +1,11 @@
 
-data1 = read.csv("aircrafts.csv")
-names(data1)
-dim(data1)
-max(table(data1$model))
-table(data1$type_operation)
-
-data2 = read.csv("occurrences.csv")
-names(data2)
-dim(data2)
-unique(data2$fu)
-
-data <- merge(data1, data2, by="occurrence_id")
+data = read.csv("../Data/aircrafts_occurrences_merged.csv")
 names(data)
 dim(data)
+
+max(table(data$model))
+table(data$type_operation)
+unique(data$fu)
 
 #################################
 

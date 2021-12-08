@@ -1,0 +1,73 @@
+---
+title: "Brazilian Aeronautics Accidents"
+description: |
+  Statistical computation and visualization (MATH-517)
+date: December 24, 2021
+author:
+- name: "Zineb AGNAOU"  
+  url: https://github.com/ZinebAg
+- name: "Fahim BECK"
+  url: https://github.com/FahimBeck
+- name: "Yiren CAO"
+  url: ???
+- name: "Matias JANVIN"
+  url: https://github.com/matiasjanvin
+- name: "Salima JAOUA"
+  url: https://github.com/salimajaoua
+- name: "Seorim PARK"
+  url: https://github.com/seorimpark
+output: distill::distill_article
+bibliography: bibliography.bib
+nocite: '@*'
+---
+
+<div style="text-align: justify">
+<div style="text-justify: inter-word">
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(knitr.duplicate.label = "allow")
+```
+
+## Introduction
+
+### Research questions
+
+
+### Approaches
+
+
+## Sources of information / datasets
+
+
+
+````{r packages, include=FALSE}
+library(ggplot2)
+library(tidyr)
+library(dplyr)
+library(corrplot)
+````
+
+```{r,include=FALSE}
+tex2markdown <- function(texstring) {
+  writeLines(text = texstring,
+             con = myfile <- tempfile(fileext = ".tex"))
+  texfile <- pandoc(input = myfile, format = "html")
+  cat(readLines(texfile), sep = "\n")
+  unlink(c(myfile, texfile))}
+```
+
+## First section 
+
+
+## Second section 
+
+
+## Conclusion
+
+
+## Future improvements
+
+
+<div id="refs"></div>
+
