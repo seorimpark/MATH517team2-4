@@ -30,7 +30,7 @@ What are the factors favoring a plane crash? What are the similarities between a
 ### Variables each person will be working with
 | Fahim | Matias | Salima | Seorim | Yiren | Zineb |
 | --- | --- | --- | --- | --- | --- |
-| country<br>fu<br>localization | year of manufacture<br>... ? | type of operation<br>operation phase ? | equipment<br>manufacturer<br>model<br>engine type<br>engine amount<br> ... | classification<br>damage level ? |  occurence day<br>occurence time |
+| - Country<br>- Fu<br>- Localization | - Year of manufacture<br>- ... ? | - Type of operation<br>- Operation phase ? | - Equipment<br>- Manufacturer<br>- Model<br>- Engine type<br>- Engine amount<br>- ... | - Classification<br>- Damage level ? |  - Occurence day<br>- Occurence time |
 
 **Type of occurence** seems worth taking it into account ...
 
