@@ -14,7 +14,7 @@ Install it in R via Github using these commands:
 devtools::install_github("rstudio/distill")
 ```
 **Do not install it via CRAN, it will not work (package not updated there).** You can try knitting the Rmd template. 
-For more information about the package: https://github.com/rstudio/distill
+For more information about the package: https://github.com/rstudio/distill.
 
 ### Main question 
 What are the factors favoring a plane crash? What are the similarities between accidents? How to reduce the risks of an aviation disaster for the safety of passengers? 
@@ -30,9 +30,9 @@ What are the factors favoring a plane crash? What are the similarities between a
 ### Variables each person will be working with
 | Fahim | Matias | Salima | Seorim | Yiren | Zineb |
 | --- | --- | --- | --- | --- | --- |
-| - Country<br>- Fu<br>- Localization | - Year of manufacture<br>- ... ? | - Type of operation<br>- Operation phase ? | - Equipment<br>- Manufacturer<br>- Model<br>- Engine type<br>- Engine amount<br>- ... | - Classification<br>- Damage level ? |  - Occurence day<br>- Occurence time |
+| - Country<br>- Fu<br>- Localization | - Year of manufacture<br>- ... ? | - Type of operation<br>- Operation phase ? | - Equipment<br>- Manufacturer<br>- Model<br>- Engine type<br>- Engine amount<br>- ... | - Classification<br>- Damage level ? |  - Occurrence day<br>- Occurrence time |
 
-**Type of occurence** seems worth taking it into account ...
+**Type of occurrence** seems worth taking it into account ...
 
 ## List of members
 - Zineb Agnaou (ZinebAg)
