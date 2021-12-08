@@ -25,7 +25,7 @@ What are the factors favoring a plane crash? What are the similarities between a
 - Map visualization, states with more accidents? (@Fahim: please let me work on maps :sob:)
 - Barplot through time: increase, decrease or constant number of accidents?/Temporal analysis (Zineb)
 - Different factors that may cause the accidents (Seorim)
-- Severe and minor accidents with PCA (Yiren)
+- Severe vs minor accidents analysis by PCA, logistic regression (Yiren)
 
 ### Variables each person will be working with
 | Fahim | Matias | Salima | Seorim | Yiren | Zineb |
@@ -40,4 +40,4 @@ What are the factors favoring a plane crash? What are the similarities between a
 - Matias Janvin (matiasjanvin)
 - Salima Jaoua (salimajaoua)
 - Seorim Park (seorimpark) 
-- Yiren Cao (**?**)
+- Yiren Cao (yirencao)

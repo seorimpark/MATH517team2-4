@@ -9,7 +9,7 @@ author:
 - name: "Fahim BECK"
   url: https://github.com/FahimBeck
 - name: "Yiren CAO"
-  url: ???
+  url: https://github.com/yirencao
 - name: "Matias JANVIN"
   url: https://github.com/matiasjanvin
 - name: "Salima JAOUA"
