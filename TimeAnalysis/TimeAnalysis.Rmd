@@ -10,6 +10,8 @@ data$occuranceWeek <- as.Date(data$occurrence_day)
 library(readr)
 library(lubridate)
 library(ggplot2)
+library(dplyr)
+library(tidyr)
 ```
 
 ```{r}
@@ -22,6 +24,7 @@ data$publicationWeek <-wday(data$publicationWeek, label=TRUE)
 # occurrence_id,,occurrence_day,publication_day, invistigation status
 ```
 
+
 ```{r}
 hist(strptime(data$time, format="%H:%M:%S"),breaks="hours")
 ```
@@ -33,6 +36,11 @@ plot(data$occuranceWeek)
 hist(data$occurrence_day,breaks='months')
 ```
 ```{r}
+Time_Occurence_publication=data$publication_day-data$occurrence_day
+Time_Occurence_publication=as.numeric(Time_Occurence_publication, units="days")
+```
 
+```{r}
+hist(Time_Occurence_publication)
 ```
 
