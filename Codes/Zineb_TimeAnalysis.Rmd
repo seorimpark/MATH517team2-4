@@ -2,9 +2,7 @@
 title: "TimeAnalysis"
 output: html_document
 ---
-```{r}
-data$occuranceWeek <- as.Date(data$occurrence_day)
-```
+
 
 ```{r setup, include=FALSE}
 library(readr)
@@ -24,6 +22,9 @@ data$publicationWeek <-wday(data$publicationWeek, label=TRUE)
 # occurrence_id,,occurrence_day,publication_day, invistigation status
 ```
 
+```{r}
+data$occuranceWeek <- as.Date(data$occurrence_day)
+```
 
 ```{r}
 hist(strptime(data$time, format="%H:%M:%S"),breaks="hours")
