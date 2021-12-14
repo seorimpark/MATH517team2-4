@@ -5,6 +5,7 @@ library(stargazer)
 library(cowplot)
 library(stringr)
 library(nominatim)
+# devtools::install_github("hrbrmstr/nominatim")
 library(leaflet)
 
 data = read.csv("../Data/aircrafts_occurrences_merged.csv")
