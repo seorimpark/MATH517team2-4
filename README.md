@@ -19,6 +19,13 @@ For more information about the package: https://github.com/rstudio/distill.
 ### Main question 
 What are the factors favoring a plane crash? What are the similarities between accidents? How to reduce the risks of an aviation disaster for the safety of passengers? 
 
+
+## Report organisation
+1- Introduction:
+  1.1- Questions:
+  1.2- Approaches:
+
+
 ### Possible subquestions
 - Are older planes more likely to crash? (Matias)
 - Instruction flights causing severe damages? (Selima)
@@ -41,3 +48,6 @@ What are the factors favoring a plane crash? What are the similarities between a
 - Salima Jaoua (salimajaoua)
 - Seorim Park (seorimpark) 
 - Yiren Cao (yirencao)
+
+
+
