@@ -1,0 +1,41 @@
+---
+title: "DamageAnalysis_Yiren"
+author: "yiren"
+date: "13/12/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+pacman::p_load(tidyverse, pacman, ggmap, ggplot2, GGally, lubridate, raster,gganimate)
+```
+
+```{r}
+data = read.csv("../Data/aircrafts_occurrences_merged.csv")
+str(data)
+# equipment, manufacturer, model?, engine_type * engines_amount, takeoff_max_weight, seatings_amount, year_manufacture, registration_category, registration_aviation, operation_phase, type_operation, fu, occurrence_day, time,
+```
+
+```{r}
+data %>% dplyr::select(damage_level, classification) %>% table()
+```
+
+Due to the fact that the destroyed cases are counted as accident rather than serious incident, we decide to use the variable `damage_level` as the target for both regression and classification.
+
+Create dummy nodes 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
