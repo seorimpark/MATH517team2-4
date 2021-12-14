@@ -21,9 +21,34 @@ What are the factors favoring a plane crash? What are the similarities between a
 
 
 ## Report organisation
-1- Introduction:
-  1.1- Questions:
-  1.2- Approaches:
+1- Introduction (Matias - Salima - Fahim)
+
+
+2- Research questions (Fahim)
+
+
+3- Approaches (Everyone, bullet points, Zineb will add everything in paragraph)
+
+
+4- Sources of information / datasets (Seorim) +  EDA (Zineb)
+  
+5 - Part 1 - Visualisation (Fahim)
+
+
+6-  Part 2 - Time analysis (Zineb and Matias)
+
+  - Visual and observation (Zineb)
+  - Analysis  of Lifespan of Plane(Matias)
+7-  Part 3 - Different factors (Selima and Seorim)
+  - Occurrence type (Selima)
+  - The rest? (Seorim)
+  
+8- Part 4 - Damage Severity analysis (Yiren)
+
+9- Conclusion (Everyone, bullet points, Fahim)
+
+10- Future improvements (Yiren)
+
 
 
 ### Possible subquestions
