@@ -59,6 +59,23 @@ tex2markdown <- function(texstring) {
 
 ## First section 
 
+```{r, echo=FALSE}
+
+library(nominatim)
+library(stringi)
+
+names = c("Neuchâtel", "EPFL")
+names_ascii = stri_trans_general(names, id = "Latin-ASCII")
+places = osm_search(names_ascii, key = "BEPERuyOgxAQ5JX0H7oOHfAFmyb4tBnx")
+table = cbind(names, places[, c("lon", "lat", "display_name")])
+
+library(leaflet)
+
+leaflet(data = table) %>% addTiles() %>%
+  addMarkers(~lon, ~lat, popup = ~as.character(display_name), label = ~as.character(names))
+
+```
+
 
 ## Second section 
 
