@@ -39,6 +39,8 @@ What are the factors favoring a plane crash? What are the similarities between a
 
   - Visual and observation (Zineb)
   - Analysis  of Lifespan of Plane(Matias)
+
+
 7-  Part 3 - Different factors (Selima and Seorim)
   - Occurrence type (Selima)
   - The rest? (Seorim)
