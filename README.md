@@ -47,7 +47,7 @@ What are the factors favoring a plane crash? What are the similarities between a
   
 8- Part 4 - Damage Severity analysis (Yiren)
 
-9- Conclusion (Everyone, bullet points, Fahim)
+9- Conclusion (Everyone, bullet points, Fahim will add everything in paragraph)
 
 10- Future improvements (Yiren)
 
