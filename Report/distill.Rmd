@@ -30,11 +30,13 @@ options(knitr.duplicate.label = "allow")
 ```
 
 ## Introduction
+Modern society has been become increasingly dependent on the use of airplanes during the past decades. Despite the impressive engineering feat that aviation represents, airplanes and other aircraft sometimes fail, occasionally fatally. Understanding the causes of failure and considering what can be done to address these is of crucial interest for regulatory bodies and aviation authorities, but also for passengers. In the following dataset, we consider an extensive collection of incidents involving aircraft of different types across Brazil in the period of time 2006-2015. Various data have been collected for each incident. In what follows, we set out to investigate common features of these aircraft incidents.
 
 ### Research questions
 
 
 ### Approaches
+We employed linear, logistic and quantile regression to investigate the association between aircraft lifetime, accident severity and damage level.
 
 
 ## Sources of information / datasets
@@ -78,10 +80,125 @@ leaflet(data = table) %>% addTiles() %>%
 
 
 ## Second section 
+### Lifetime of aircraft
+```{r include=FALSE}
+df.age <- read_csv("../Data/aircrafts_occurrences_merged.csv")
+```
 
+In this section, we consider whether there is any association between the age of an aircraft and the severity and damage level of the incident. To begin, we have plotted the cumulative distribution function of the aircrafts' age in Figure (\@ref(fig:age_CDF)) below.
+
+
+
+
+```{r echo=FALSE}
+# Setting categorical variables to factors and removing missing values
+
+# Removing rows with missing or 0 value for the year of manufacture
+df.age<-df.age[df.age$year_manufacture!=0 & !is.na(df.age$year_manufacture),]
+
+# Extracting the year of occurrence
+df.age$occurrence_day<-as.numeric(format(df.age$occurrence_day, format="%Y"))
+
+df.age$lifetime<-df.age$occurrence_day-df.age$year_manufacture
+
+
+# Plotting cumulative distribution functions
+# plot(ecdf(df.age$occurrence_day))
+# plot(ecdf(df.age$year_manufacture))
+
+
+
+# First, we assign a numerical value to each damage level, and remove rows with unknown damage level
+
+df.damage.age<-df.age[df.age$damage_level!='UNKNOWN',]
+df.damage.age$damage_level[df.damage.age$damage_level=='NONE']<-0
+df.damage.age$damage_level[df.damage.age$damage_level=='LIGHT']<-1
+df.damage.age$damage_level[df.damage.age$damage_level=='SUBSTANTIAL']<-2
+df.damage.age$damage_level[df.damage.age$damage_level=='DESTROYED']<-3
+df.damage.age$damage_level<-as.numeric(df.damage.age$damage_level)
+
+# Assign values 0 to incidents classified as 'accident', and 1 to incidents classified as serious incident
+df.damage.age$classification[df.damage.age$classification=='ACCIDENT']<-0
+df.damage.age$classification[df.damage.age$classification=="SERIOUS INCIDENT"]<-1
+df.damage.age$classification<-as.numeric(df.damage.age$classification)
+
+# Set aircraft type as factor, and remove NA rows
+df.damage.age$equipment<-as.factor(df.damage.age$equipment)
+df.damage.age<-df.damage.age[!is.na(df.damage.age$equipment),]
+```
+
+```{r age_CDF, fig.cap="Cumulative distribution function of the aircraft's lifetime, denoted by $X$", echo=FALSE}
+plot( ecdf(df.age$lifetime), main='', ylab =TeX('$P(X\\leq x)$') )
+```
+
+We observe that more than 80% of the aircraft are between 0 and 40 years old at the time of the incident, with a small number of aircraft reaching nearly 80 years.
+
+Next, we provide a scatter plot to visually inspect the association between age and damage level in (\@ref(fig:damage_lifetime))
+```{r damage_lifetime, fig.cap="Scatter plot of damage level (coded on a 0-3 scale) versus aircraft lifetime in recorded incidents", echo=FALSE}
+plot(df.damage.age$lifetime, df.damage.age$damage_level, 'p', xlab='Aircraft lifetime',ylab='Damage level')
+```
+
+and likewise between aircraft lifetime damage level (outcome)  in (\@ref(fig:damage_severity))
+
+```{r damage_severity, fig.cap="Scatter plot of severity versus aircraft lifetime in recorded incidents", echo=FALSE}
+plot(df.damage.age$lifetime, df.damage.age$classification, 'p', xlab='Aircraft lifetime', ylab='accident severity')
+```
+
+
+To investigate the marginal association between age and damage level we perform regression analysis using a linear model, logistic model in addition to quantile regression. 
+
+The fit diagnostic for the linear regression of damage level on lifetime of the plane gives
+```{r echo=FALSE}
+fit.linear<-lm(df.damage.age$damage_level ~ df.damage.age$lifetime)
+summary(fit.linear)
+```
+
+Here, we have coded the damage level on a scale of 0 to 3. Furthermore, the confidence interval is given by
+```{r echo=FALSE}
+cbind(beta = coef(fit.linear), confint(fit.linear))
+```
+which is small and includes the null value of the slope. 
+
+Likewise, the logistic regression of aircraft lifetime on severity (with corresponding confidence intervals) is given below:
+
+```{r echo=FALSE}
+fit.logistic <-glm(classification ~ lifetime, data = df.damage.age, family = "binomial")
+summary(fit.logistic)
+exp(coef(fit.logistic))
+exp(cbind(OR = coef(fit.logistic), confint(fit.logistic)))
+```
+
+Once again, the confidence interval includes the null value. Finally, we consider the quantile regression coefficient from the quantile regression model
+$$ Q_Y(\tau\mid X) = a_0(\tau) + b_0(\tau)X $$
+where the outcome $Y$ is airplane lifetime and we take accident severity as an exposure $X$. The resulting regression coefficient is plotted in Figure (\@ref(fig:quantile_lifetime))
+
+```{r quantile_lifetime, fig.cap="Quantile regression of damage level on the quantile of aircraft lifetime", echo=FALSE}
+# Quantile regression for severity
+fm2 <- rq(lifetime ~ classification, data = df.damage.age, tau =  0.1+ 1:8/10)
+plot(fm2, parm = 2, mar = c(5.1, 4.1, 2.1, 2.1), xlab=TeX('$\\tau$'),main='Y = Lifetime, X = Damage level', ylab = TeX('$b_0(\\tau$)'), cex = 1, pch = 19)
+```
+
+The quantile plot shows that the conditional cumulative distribution function, conditioning on severity level 'serious incident', is narrower compared to the conditional cumulative distribution function, conditioning on severity level 'accident'. In other words, both high and low quantiles are shifted towards the median.
+
+
+
+As we did not find any strong associations between damage level and age of the aircraft marginally in the population. This motivated us to examine further whether such associations could exist within subsets of the population, such as the strata of incidents involving helicopters. Once again, we perform a logistic regression, which yields the following fit diagnostic and confidence intervals:
+
+
+
+```{r echo=FALSE}
+df.helicopters<-df.damage.age[df.equipment='HELICOPTER',]
+fit.logistic <-glm(classification ~ lifetime, data = df.helicopters, family = "binomial")
+summary(fit.logistic)
+exp(coef(fit.logistic))
+exp(cbind(OR = coef(fit.logistic), confint(fit.logistic)))
+```
+
+We do not find a strong association between accident severity and aircraft age within the stratum of helicopters either (the confidence interval for the lifetime coefficient includes the null-value, and the p-value of the coefficeint is 0.227).
 
 ## Conclusion
 
+We employed linear, logistic and quantile regression to investigate the association between aircraft lifetime, accident severity and damage level, but did not find any statistically significant associations.
 
 ## Future improvements
 
