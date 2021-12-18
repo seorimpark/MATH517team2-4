@@ -17,6 +17,7 @@ author:
 - name: "Seorim PARK"
   url: https://github.com/seorimpark
 output: distill::distill_article
+extra_dependencies: ["amssymb"]
 bibliography: bibliography.bib
 nocite: '@*'
 ---
@@ -30,12 +31,29 @@ options(knitr.duplicate.label = "allow")
 ```
 
 ## Introduction
+
 Modern society has been become increasingly dependent on the use of airplanes during the past decades. Despite the impressive engineering feat that aviation represents, airplanes and other aircraft sometimes fail, occasionally fatally. Understanding the causes of failure and considering what can be done to address these is of crucial interest for regulatory bodies and aviation authorities, but also for passengers. In the following dataset, we consider an extensive collection of incidents involving aircraft of different types across Brazil in the period of time 2006-2015. Various data have been collected for each incident. In what follows, we set out to investigate common features of these aircraft incidents.
 
 ### Research questions
 
+The main issue is to understand the factors that favor a plane crash, especially in Brazil in a 10-year period. Similarities between the accidents will be sought. Perhaps would it be possible to identify risk factors thereby improving passenger safety? 
+
+Here are some more specific questions arising from the main problem that we will try to answer: 
+
+- How are the accidents distributed on a map? Are there areas where accidents are more concentrated? 
+
+- How do the accidents evolve through time? Is the occurrence rate constant? Are there periods with more accidents, i.e. during school vacation, summer? Do they happen at a certain time of the day?
+
+- Does the age of the aircraft play a role? Are old planes more prone to accidents? 
+
+- What about the characteristics of the aircraft? Is the model, the mass or the number of engines take a part in causing a crash?
+
+- What are the main occurrence types or cause of accidents? 
+
+- What can we say about damage severity of the accidents? Are there correlations?
 
 ### Approaches
+
 We employed linear, logistic and quantile regression to investigate the association between aircraft lifetime, accident severity and damage level.
 
 
@@ -45,9 +63,19 @@ We employed linear, logistic and quantile regression to investigate the associat
 
 ````{r packages, include=FALSE}
 library(ggplot2)
+library(geobr)
 library(tidyr)
 library(dplyr)
 library(corrplot)
+library(stargazer)
+library(cowplot)
+library(snakecase)
+library(stringi)
+library(stringr)
+library(leaflet)
+library(readr)
+library(quantreg)
+library(latex2exp)
 ````
 
 ```{r,include=FALSE}
@@ -59,36 +87,178 @@ tex2markdown <- function(texstring) {
   unlink(c(myfile, texfile))}
 ```
 
-## First section 
+## Geographical visualization of accidents 
 
-```{r, echo=FALSE}
+```{r, include=FALSE}
 
-library(nominatim)
-library(stringi)
+data = read.csv("../Data/aircrafts_occurrences_merged.csv")
 
-names = c("Neuchâtel", "EPFL")
-names_ascii = stri_trans_general(names, id = "Latin-ASCII")
-places = osm_search(names_ascii, key = "BEPERuyOgxAQ5JX0H7oOHfAFmyb4tBnx")
-table = cbind(names, places[, c("lon", "lat", "display_name")])
+# Select needed variables
+data = data[, c("localization", "fu", "country", "aerodrome", "origin_flight", 
+                "destination_flight", "registration_country", "classification", 
+                "registration", "manufacturer", "model", "operation_phase", 
+                "damage_level", "type.of.occurrence", "occurrence_day", "time")]
 
-library(leaflet)
+# Formatting
+data$classification = tolower(data$classification)
+data$manufacturer[data$manufacturer == "***"] = "unknown"
+data$model[data$model == "***"] = "unknown"
+data$operation_phase = tolower(data$operation_phase)
+data$operation_phase[data$operation_phase == ""]  = "unknown"
+data$damage_level = tolower(data$damage_level)
+data$type.of.occurrence = tolower(data$type.of.occurrence)
 
-leaflet(data = table) %>% addTiles() %>%
-  addMarkers(~lon, ~lat, popup = ~as.character(display_name), label = ~as.character(names))
+
+#### Accidents per state ####
+
+# Brazil states
+brazil_fu = data[data$fu != "***" & data$fu != "EX",]
+
+# Accidents per state
+brazil_fu = data.frame(table(brazil_fu$fu))
+colnames(brazil_fu) = c("fu", "accidents")
+
+# Brazilian states
+states <- read_state(year=2019)
+
+# Join the databases
+states <- dplyr::left_join(states, brazil_fu, by = c("abbrev_state" = "fu"))
+states$accidents[is.na(states$accidents)] = 0
+
+# Map
+labels <- sprintf(
+  "<strong>%s</strong><br/>%g accidents",
+  states$name_state, states$accidents
+) %>% lapply(htmltools::HTML)
+
+bins <- seq(0,500,100)
+pal <- colorBin("YlOrRd", domain = states$accidents, bins = bins)
+
+fu <- leaflet(states) %>% addTiles() %>% addPolygons(
+  fillColor = ~pal(accidents),
+  weight = 1,
+  opacity = 1,
+  color = "grey",
+  dashArray = "3",
+  fillOpacity = 0.4, 
+  layerId = ~geom,
+  highlightOptions = highlightOptions(
+    weight = 3,
+    color = "#666",
+    dashArray = "",
+    fillOpacity = 0.6,
+    bringToFront = TRUE),
+  label = labels,
+  labelOptions = labelOptions(
+    style = list("font-weight" = "normal", padding = "3px 8px"),
+    textsize = "15px",
+    direction = "auto")) %>%
+  addLegend(pal = pal, values = ~accidents, opacity = 0.7, title = "Accidents",
+            position = "bottomright")
+
+# External accidents + NAs
+external = t(data.frame(table(data[data$fu == "***" | data$fu == "EX", "country"])))
+rownames(external) = c("Countries", "Accidents")
+#stargazer(external)
+
+# Preparing data before geolocating
+brazil = data[data$fu != "***" & data$fu != "EX" & data$localization != "NÃO IDENTIFICADA",]
+
+# Loading coordinates
+table = readRDS(file = "localization.rds")
+
+# Adding location
+brazil$localization = to_title_case(brazil$localization)
+n = length(brazil$localization)
+loc = 0
+
+for (i in 1:n) {
+  loc = rbind(loc, table[table$names==brazil$localization[i], c("lon", "lat")])
+}
+
+brazil = cbind(brazil, loc[-1,])
+
+# Label + popup
+label <- sprintf("%s<br/>%s<br/>%s<br/>%s",
+                  brazil$model,
+                  brazil$classification,
+                  brazil$occurrence_day,
+                  brazil$localization
+                  ) %>% lapply(htmltools::HTML)
+
+popup <- paste(sep = "<br/>", 
+               paste("Model:", brazil$model),
+               paste("Manufacturer:", brazil$manufacturer),
+               paste("Registration:", brazil$registration),
+               paste("Classification:", brazil$classification),
+               paste("Damage level:", brazil$damage_level),
+               paste("Operation phase:", brazil$operation_phase),
+               paste("Type of occurrence:", brazil$type.of.occurrence),
+               paste("Occurrence date:", brazil$occurrence_day),
+               paste("Occurrence time:", brazil$time)
+               )
+
+# Map
+cluster <- leaflet(data = brazil) %>% addTiles() %>% 
+  addMarkers(~lon, ~lat, popup = popup, label = label, clusterOptions = markerClusterOptions())
+
+# Cities with most accidents
+cities = t(data.frame(sort(table(brazil$localization), decreasing = TRUE)[1:10]))
+rownames(cities) = c("Cities", "Accidents")
+#stargazer(cities)
 
 ```
 
+This section is devoted to the study of the places where aircraft accidents occur. Indeed, it is essential to understand where they occur in order to identify more risk factors.
 
-## Second section 
-### Lifetime of aircraft
+First, a comparison between the Brazilian states allows us to draw a first conclusion (Figure \@ref(fig:states)). Note that accidents are cumulative over the 10-year period. 
+
+```{r states, fig.cap="Number of accidents from 2006 to 2015 by state in Brazil", echo=FALSE}
+
+fu
+
+```
+
+All the states have less than 200 accidents, more precisely less than 170 (Rio Grande do Sul), except one state: São Paulo. This state is not larger than the others (it is rather medium in size), which indicates that there is clearly a concentration of accidents in this area. Note that ten accidents are not shown on the map (Table 1). Eight of them occurred outside of Brazil and two more for other reasons: one ended up in international waters and the other does not have its location identified. 
+
+```{r, results='asis', echo=FALSE}
+
+stargazer(external, type = "html", title = "Table 1: Accidents not reprensented on the previous map by country")
+
+```
+
+An explanation for this is ... 
+
+To be more precise in the geographical approach, it is possible to establish a map according to the location of the accident (nearest city). As the geographic coordinates are not included in the data, it is possible to use geocoding given that the city is available. For this, we used two packages: `ggmap` and `Nominatim`. An API key is required to geocode for each package ([Google Maps](https://mapsplatform.google.com) for `ggmap` and [MapQuest](https://developer.mapquest.com) for `Nominatim`). As the locations are quite precise, there are often errors in the coordinates returned by geocoding, which is why we used two packages by selecting the most reasonable coordinates. It is still possible to have some deviations between the city and the place shown on the map, but the latter should not be greater than a degree of longitude and latitude. 
+
+In Figure \@ref(fig:location), accidents are represented in clusters which are scattered by zooming. For each accident, information is available such as the model, the manufacturer, the date or the time. Note that 11 more accidents have been compared to the last map. The reason is that the location has not been identified. 
+
+```{r location, fig.cap="Number of accidents from 2006 to 2015 clustered by location in Brazil", echo=FALSE}
+
+cluster
+
+```
+
+We notice the same thing again ... 
+
+Table 2 represents the ten cities with the most accidents. 
+
+```{r, results='asis', echo=FALSE}
+
+stargazer(cities, type = "html", title = "Table 2: Top ten cities with the highest number of accidents")
+
+```
+
+The observation remains the same: these are the largest cities in Brazil, each having the largest airports in the country with the most air traffic.  
+
+
+## Lifetime of aircraft
+
 ```{r include=FALSE}
 df.age <- read_csv("../Data/aircrafts_occurrences_merged.csv")
 ```
 
-In this section, we consider whether there is any association between the age of an aircraft and the severity and damage level of the incident. To begin, we have plotted the cumulative distribution function of the aircrafts' age in Figure (\@ref(fig:age_CDF)) below.
-
-
-
+In this section, we consider whether there is any association between the age of an aircraft and the severity and damage level of the incident. To begin, we have plotted the cumulative distribution function of the aircrafts' age in Figure \@ref(fig:ageCDF) below.
 
 ```{r echo=FALSE}
 # Setting categorical variables to factors and removing missing values
@@ -127,36 +297,39 @@ df.damage.age$equipment<-as.factor(df.damage.age$equipment)
 df.damage.age<-df.damage.age[!is.na(df.damage.age$equipment),]
 ```
 
-```{r age_CDF, fig.cap="Cumulative distribution function of the aircraft's lifetime, denoted by $X$", echo=FALSE}
-plot( ecdf(df.age$lifetime), main='', ylab =TeX('$P(X\\leq x)$') )
+```{r ageCDF, fig.cap="Cumulative distribution function of the aircraft's lifetime, denoted by $X$", echo=FALSE}
+plot( ecdf(df.age$lifetime), main='', ylab =TeX('$P(X \\leq x)$') )
 ```
 
 We observe that more than 80% of the aircraft are between 0 and 40 years old at the time of the incident, with a small number of aircraft reaching nearly 80 years.
 
-Next, we provide a scatter plot to visually inspect the association between age and damage level in (\@ref(fig:damage_lifetime))
-```{r damage_lifetime, fig.cap="Scatter plot of damage level (coded on a 0-3 scale) versus aircraft lifetime in recorded incidents", echo=FALSE}
+Next, we provide a scatter plot to visually inspect the association between age and damage level in (\@ref(fig:damagelifetime))
+
+```{r damagelifetime, fig.cap="Scatter plot of damage level (coded on a 0-3 scale) versus aircraft lifetime in recorded incidents", echo=FALSE}
 plot(df.damage.age$lifetime, df.damage.age$damage_level, 'p', xlab='Aircraft lifetime',ylab='Damage level')
 ```
 
-and likewise between aircraft lifetime damage level (outcome)  in (\@ref(fig:damage_severity))
+and likewise between aircraft lifetime damage level (outcome)  in (\@ref(fig:damageseverity))
 
-```{r damage_severity, fig.cap="Scatter plot of severity versus aircraft lifetime in recorded incidents", echo=FALSE}
+```{r damageseverity, fig.cap="Scatter plot of severity versus aircraft lifetime in recorded incidents", echo=FALSE}
 plot(df.damage.age$lifetime, df.damage.age$classification, 'p', xlab='Aircraft lifetime', ylab='accident severity')
 ```
-
 
 To investigate the marginal association between age and damage level we perform regression analysis using a linear model, logistic model in addition to quantile regression. 
 
 The fit diagnostic for the linear regression of damage level on lifetime of the plane gives
+
 ```{r echo=FALSE}
 fit.linear<-lm(df.damage.age$damage_level ~ df.damage.age$lifetime)
 summary(fit.linear)
 ```
 
 Here, we have coded the damage level on a scale of 0 to 3. Furthermore, the confidence interval is given by
+
 ```{r echo=FALSE}
 cbind(beta = coef(fit.linear), confint(fit.linear))
 ```
+
 which is small and includes the null value of the slope. 
 
 Likewise, the logistic regression of aircraft lifetime on severity (with corresponding confidence intervals) is given below:
@@ -170,9 +343,9 @@ exp(cbind(OR = coef(fit.logistic), confint(fit.logistic)))
 
 Once again, the confidence interval includes the null value. Finally, we consider the quantile regression coefficient from the quantile regression model
 $$ Q_Y(\tau\mid X) = a_0(\tau) + b_0(\tau)X $$
-where the outcome $Y$ is airplane lifetime and we take accident severity as an exposure $X$. The resulting regression coefficient is plotted in Figure (\@ref(fig:quantile_lifetime))
+where the outcome $Y$ is airplane lifetime and we take accident severity as an exposure $X$. The resulting regression coefficient is plotted in Figure (\@ref(fig:quantilelifetime))
 
-```{r quantile_lifetime, fig.cap="Quantile regression of damage level on the quantile of aircraft lifetime", echo=FALSE}
+```{r quantilelifetime, fig.cap="Quantile regression of damage level on the quantile of aircraft lifetime", echo=FALSE}
 # Quantile regression for severity
 fm2 <- rq(lifetime ~ classification, data = df.damage.age, tau =  0.1+ 1:8/10)
 plot(fm2, parm = 2, mar = c(5.1, 4.1, 2.1, 2.1), xlab=TeX('$\\tau$'),main='Y = Lifetime, X = Damage level', ylab = TeX('$b_0(\\tau$)'), cex = 1, pch = 19)
@@ -180,11 +353,7 @@ plot(fm2, parm = 2, mar = c(5.1, 4.1, 2.1, 2.1), xlab=TeX('$\\tau$'),main='Y = L
 
 The quantile plot shows that the conditional cumulative distribution function, conditioning on severity level 'serious incident', is narrower compared to the conditional cumulative distribution function, conditioning on severity level 'accident'. In other words, both high and low quantiles are shifted towards the median.
 
-
-
 As we did not find any strong associations between damage level and age of the aircraft marginally in the population. This motivated us to examine further whether such associations could exist within subsets of the population, such as the strata of incidents involving helicopters. Once again, we perform a logistic regression, which yields the following fit diagnostic and confidence intervals:
-
-
 
 ```{r echo=FALSE}
 df.helicopters<-df.damage.age[df.equipment='HELICOPTER',]
@@ -194,7 +363,7 @@ exp(coef(fit.logistic))
 exp(cbind(OR = coef(fit.logistic), confint(fit.logistic)))
 ```
 
-We do not find a strong association between accident severity and aircraft age within the stratum of helicopters either (the confidence interval for the lifetime coefficient includes the null-value, and the p-value of the coefficeint is 0.227).
+We do not find a strong association between accident severity and aircraft age within the stratum of helicopters either (the confidence interval for the lifetime coefficient includes the null-value, and the p-value of the coefficient is 0.227).
 
 ## Conclusion
 

@@ -3,9 +3,11 @@ library(ggplot2)
 library(geobr)
 library(stargazer)
 library(cowplot)
+library(snakecase)
+library(stringi)
 library(stringr)
+library(ggmap)
 library(nominatim)
-# devtools::install_github("hrbrmstr/nominatim")
 library(leaflet)
 
 data = read.csv("../Data/aircrafts_occurrences_merged.csv")
@@ -30,7 +32,6 @@ table(data$country)
 data$classification = tolower(data$classification)
 table(data$classification)
 unique(data$registration)
-data$manufacturer = str_to_title(iconv(data$manufacturer, to = "ASCII//TRANSLIT"))
 data$manufacturer[data$manufacturer == "***"] = "unknown"
 unique(data$manufacturer)
 data$model[data$model == "***"] = "unknown"
@@ -91,7 +92,6 @@ map(brazil)
 # External accidents + NAs
 external = t(data.frame(table(data[data$fu == "***" | data$fu == "EX", "country"])))
 rownames(external) = c("Countries", "Accidents")
-external["Countries",] = str_to_title(external["Countries",])
 external
 stargazer(external)
 
@@ -101,58 +101,134 @@ map2 <- map(brazil_severe, title = "Brazilian Aeronautics Serious Incidents")
 plot_grid(map1, map2)
 
 
-#### Geolocating with Nominatim - TRY ####
+#### Geolocating with ggmap (Google API) - TRY ####
+
+# API key
+register_google(key = "") # Cf. Google Cloud Platform
 
 # Geolocating
-names = c("Neuchâtel", "EPFL")
-names_ascii = iconv(names, to = "ASCII//TRANSLIT")
-places = osm_search(names_ascii, key = "BEPERuyOgxAQ5JX0H7oOHfAFmyb4tBnx")
-table = cbind(names, places[, c("lon", "lat", "display_name")])
+names = c("NEUCHÂTEL", "EPFL")
+names_lower = str_to_title(names)
+places = geocode(names_lower)
+table = cbind(names_lower, places)
 table
 
 # Map
 leaflet(data = table) %>% addTiles() %>%
-  addMarkers(~lon, ~lat, popup = ~as.character(display_name), label = ~as.character(names))
+  addMarkers(~lon, ~lat, label = ~as.character(names_lower))
 
-#### Accidents per localization ####
+#### Localizing ggmap + Nominatim ####
 
 # Preparing data before geolocating
 brazil = data[data$fu != "***" & data$fu != "EX" & data$localization != "NÃO IDENTIFICADA",]
 names = unique(brazil$localization)
-names_ascii = str_to_title(iconv(names, to = "ASCII//TRANSLIT"))
-names_ascii_brazil = paste(names_ascii, ", Brazil", sep = "")
-length(names_ascii_brazil)
+names_lower = to_title_case(names)
+names_lower_brazil = paste(names_lower, ", Brazil", sep = "")
+length(names_lower_brazil)
 
-# # Geolocating
-# places = osm_search(names_ascii_brazil, key = "BEPERuyOgxAQ5JX0H7oOHfAFmyb4tBnx")
-# table = cbind(names_ascii, places[c("lon", "lat", "display_name")])
+# # Geolocating ggmap
+# places = geocode(names_lower_brazil)
+# table = cbind(names_lower, places)
 # names(table)[1] = "names"
 # 
 # # Saving or loading
-#  saveRDS(table, file = "localization.rds")
+# saveRDS(table, file = "localization_ggmap.rds")
+# 
+# # Loading ggmap and nominatim positions
+# table = readRDS(file = "localization_ggmap.rds")
+# table_nom = readRDS(file = "localization_nominatim.rds")[, 1:3]
+# 
+# # Order
+# diff = table_nom[order(table_nom$names),]
+# table = table[order(table$names),]
+# 
+# # Take difference > 1 for lon or lat
+# diff[,c("lon", "lat")] = abs(diff[,c("lon", "lat")] - table[,c("lon", "lat")])
+# diff = diff[diff$lon>1 | diff$lat>1,]
+# dim(diff)
+# diff
+# 
+# # Prepare to locate with Nominatim
+# names_brazil = paste(diff$names, ", Brazil", sep = "")
+# length(names_brazil)
+# 
+# # Geolocating Nominatim
+# places = osm_search(names_brazil, key = "BEPERuyOgxAQ5JX0H7oOHfAFmyb4tBnx")
+# table_change = cbind(diff$names, places[c("lon", "lat")])
+# names(table_change)[1] = "names"
+# 
+# # Map check
+# leaflet(data = table_change) %>% addTiles() %>%
+#   addMarkers(~lon, ~lat, label = ~as.character(names))
+# 
+# # To change
+# change = c("Alenquer", "Arroio Grande", "Jurua", "Nova Esperanca", "Novo Aripuana", 
+#            "Novo Planalto", "Pedra Preta", "Prata", "Ponta De Pedras", "Pindorama", 
+#            "Sao Paulo", "Sao Pedro", "Sao Felix Do Xingu", "Sao Sebastiao Da Boa Vista", 
+#            "Senador Jose Porfirio")
+# 
+# length(change)
+# 
+# # Locate with ggmap
+# places = geocode(paste(change, ", Brazil", sep = ""))
+# change = cbind(change, places)
+# names(change)[1] = "names"
+# dim(change)
+# change
+# 
+# # Map check
+# leaflet(data = change) %>% addTiles() %>%
+#   addMarkers(~lon, ~lat, label = ~as.character(names))
+# 
+# # Order
+# table_change = table_change[order(table_change$names),]
+# change = change[order(change$names),]
+# 
+# # Add changes from ggmap
+# table_change[table_change$names %in% change$names, c("lon", "lat")] = change[, c("lon", "lat")]
+# table_change
+# 
+# # Take names with changed location with accents
+# names_change = table[stri_trans_general(str = table$names, id = "Latin-ASCII") %in% table_change$names, "names"]
+# names_change
+# 
+# # Change postitions according to ggmap and Nominatim
+# table[is.element(table$names, names_change), c("lon", "lat")] = table_change[, c("lon", "lat")]
+# 
+# Specific changes
+# specific = osm_search("Goianira", key = "BEPERuyOgxAQ5JX0H7oOHfAFmyb4tBnx")
+# table[table$names == "Goianira", c("lon", "lat")] = specific[c("lon", "lat")]
+# 
+# specific = geocode("Brasília, Brazil")
+# table[table$names == "Brasília", c("lon", "lat")] = specific[c("lon", "lat")]
+# 
+# # Saving or loading
+# saveRDS(table, file = "localization.rds")
 table = readRDS(file = "localization.rds")
 
 # Check
 names(table)
 dim(table)
-head(table[,1:3])
+head(table)
+
+######################################
 
 # Map check
 leaflet(data = table) %>% addTiles() %>%
-  addMarkers(~lon, ~lat, popup = ~as.character(display_name), label = ~as.character(names))
+  addMarkers(~lon, ~lat, label = ~as.character(names))
 
 # Map check cluster
 leaflet(data = table) %>% addTiles() %>%
-  addMarkers(~lon, ~lat, popup = ~as.character(display_name), label = ~as.character(names), 
+  addMarkers(~lon, ~lat, label = ~as.character(names), 
              clusterOptions = markerClusterOptions())
 
 # Adding location
-brazil$localization = str_to_title(iconv(brazil$localization, to = "ASCII//TRANSLIT"))
+brazil$localization = to_title_case(brazil$localization)
 (n = length(brazil$localization))
 loc = 0
 
 for (i in 1:n) {
-  loc = rbind(loc, table[table$names==brazil$localization[i], c("lon", "lat", "display_name")])
+  loc = rbind(loc, table[table$names==brazil$localization[i], c("lon", "lat")])
 }
 
 brazil = cbind(brazil, loc[-1,])
@@ -160,6 +236,7 @@ dim(brazil)
 names(brazil)
 head(brazil)
 
+# Label + popup
 label <- sprintf("%s<br/>%s<br/>%s<br/>%s",
                   brazil$model,
                   brazil$classification,
@@ -182,7 +259,6 @@ popup <- paste(sep = "<br/>",
 # Map
 cluster <- leaflet(data = brazil) %>% addTiles() %>% 
   addMarkers(~lon, ~lat, popup = popup, label = label, clusterOptions = markerClusterOptions())
-
 
 # Brazil states
 brazil_fu = data[data$fu != "***" & data$fu != "EX",]
@@ -235,7 +311,8 @@ fu
 fu %>% addMarkers(data = brazil, ~lon, ~lat, popup = popup, label = label, 
                   clusterOptions = markerClusterOptions())
 
-
-
-
-
+# Cities with most accidents
+cities = t(data.frame(sort(table(brazil$localization), decreasing = TRUE)[1:10]))
+rownames(cities) = c("Cities", "Accidents")
+cities
+stargazer(cities)
