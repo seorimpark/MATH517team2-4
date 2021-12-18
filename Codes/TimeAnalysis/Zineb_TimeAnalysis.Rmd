@@ -13,7 +13,7 @@ library(tidyr)
 ```
 
 ```{r, include=FALSE}
-data <- read_csv("../Data/aircrafts_occurrences_merged.csv")
+data <- read_csv("aircrafts_occurrences_merged.csv")
 data$occuranceWeek <- as.Date(data$occurrence_day)
 data$occuranceWeek <-wday(data$occuranceWeek, label=TRUE)
 

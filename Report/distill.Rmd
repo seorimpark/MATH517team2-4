@@ -93,7 +93,7 @@ tex2markdown <- function(texstring) {
 ```{r, include=FALSE}
 # loading the data
 #data=read.csv("~/Desktop/Github/SCV/SCV_project/MATH517team2-4/MATH517team2-4/Data/aircrafts_occurrences_merged.csv")
-data = read.csv("../Data/aircrafts_occurrences_merged.csv")
+data = read.csv("aircrafts_occurrences_merged.csv")
 ```
 
 ```{r,include=FALSE}
@@ -365,6 +365,8 @@ Looking more closely at the accidents in these cities, we see that all kinds of 
 
 ###Visualisation:
 ```{r, include=FALSE}
+data = read.csv("aircrafts_occurrences_merged.csv") 
+
 data$occuranceWeek <- as.Date(data$occurrence_day)
 data$occuranceWeek <-wday(data$occuranceWeek, label=TRUE)
 
