@@ -4,7 +4,7 @@ output: html_document
 ---
 
 
-```{r setup, include=FALSE}
+```{r, include=FALSE}
 library(readr)
 library(lubridate)
 library(ggplot2)
@@ -12,7 +12,7 @@ library(dplyr)
 library(tidyr)
 ```
 
-```{r}
+```{r, include=FALSE}
 data <- read_csv("../Data/aircrafts_occurrences_merged.csv")
 data$occuranceWeek <- as.Date(data$occurrence_day)
 data$occuranceWeek <-wday(data$occuranceWeek, label=TRUE)
@@ -22,26 +22,24 @@ data$publicationWeek <-wday(data$publicationWeek, label=TRUE)
 # occurrence_id,,occurrence_day,publication_day, invistigation status
 ```
 
-```{r}
+```{r, include=FALSE}
 data$occuranceWeek <- as.Date(data$occurrence_day)
 ```
 
-```{r}
-hist(strptime(data$time, format="%H:%M:%S"),breaks="hours")
-```
-```{r}
-plot(data$occuranceWeek)
+```{r,echo=FALSE}
+hist(strptime(data$time, format="%H:%M:%S"),main="Distribution of Accidents throughout the hours of the day",xlab="Hours of the day",breaks="hours")
 ```
 
-```{r}
-hist(data$occurrence_day,breaks='months')
+```{r, echo=FALSE}
+hist(data$occurrence_day,main="Distribution of Accidents throughout the time",xlab="Days",breaks='months')
 ```
-```{r}
+
+```{r, include=FALSE}
 Time_Occurence_publication=data$publication_day-data$occurrence_day
 Time_Occurence_publication=as.numeric(Time_Occurence_publication, units="days")
 ```
 
-```{r}
+```{r,echo=FALSE}
 hist(Time_Occurence_publication)
 ```
 

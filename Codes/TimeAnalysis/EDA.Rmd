@@ -1,0 +1,111 @@
+---
+title: "EDA"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r, include=FALSE}
+library(readr)
+library(lubridate)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+```
+
+```{r, include=FALSE}
+data <- read_csv("../Data/aircrafts_occurrences_merged.csv")
+```
+
+```{r}
+summary(data)
+```
+```{r}
+na_count <-sapply(data, function(y) sum(length(which(is.na(y)))))
+#na_count <- data.frame(na_count)
+na_count
+```
+```{r}
+data_wo_na=drop_na(data)
+```
+
+No rows without NAs
+
+## looking at the equipment
+
+```{r}
+table(data["equipment"])
+```
+
+
+## looking at the manufacturer
+
+
+```{r}
+unique(data["manufacturer"])
+```
+```{r}
+table(data["manufacturer"])
+
+```
+
+NEIVA INDUSTRIA AERONAUTICA   388, EMBRAER  155, AERO BOERO  126
+
+
+
+```{r, include=FALSE}
+table(data$engine_type)
+```
+```{r, include=FALSE}
+table(data$engines_amount)
+```
+
+
+```{r, echo=FALSE}
+data_weight_no_zero=data
+data_weight_no_zero=data_weight_no_zero[data_weight_no_zero$takeoff_max_weight..Lbs. != 0,]
+hist(data_weight_no_zero$takeoff_max_weight..Lbs., main="Distribution of take off max weight (in Lbs)", xlab='Lbs', breaks =50)
+```
+```{r}
+data_year_no_zero=data
+data_year_no_zero=data_year_no_zero[data_year_no_zero$year_manufacture != 0,]
+hist(data_year_no_zero$year_manufacture,breaks=100, main="Distribution of manufacturing year", xlab="Year")
+```
+```{r}
+table(data$registration_country)
+```
+```{r}
+table(data$registration_aviation)
+```
+```{r}
+table(data$operation_phase)
+```
+```{r}
+table(data$damage_level)
+```
+```{r}
+table(data$classification)
+```
+
+```{r}
+hist(data$fatalities_amount, breaks=50)
+```
+
+```{r}
+# flight with the most fatalities
+data[60,]
+```
+```{r}
+table(data$under_investigation)
+```
+
+```{r}
+table(data$investigating_command)
+```
+
+```{r}
+table(data$investigation_status)
+```
+
