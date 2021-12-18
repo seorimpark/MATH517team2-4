@@ -17,8 +17,8 @@ author:
 - name: "Seorim PARK"
   url: https://github.com/seorimpark
 output: distill::distill_article
-extra_dependencies: ["amssymb"]
 bibliography: bibliography.bib
+csl: https://raw.githubusercontent.com/citation-style-language/styles/master/apa-annotated-bibliography.csl
 nocite: '@*'
 ---
 
@@ -227,11 +227,11 @@ stargazer(external, type = "html", title = "Table 1: Accidents not reprensented 
 
 ```
 
-An explanation for this is ... 
+An explanation for this observation is linked in particular to demography. Indeed, the state of São Paulo is the most populous in Brazil with more than 41 million inhabitants in 2010 [@population]. Air traffic is therefore concentrated there, especially since the largest airports of the country are located in this state (for example São Paulo Guarulhos International Airport and São Paulo Congonhas Airport). The risk of accidents is therefore higher. 
 
 To be more precise in the geographical approach, it is possible to establish a map according to the location of the accident (nearest city). As the geographic coordinates are not included in the data, it is possible to use geocoding given that the city is available. For this, we used two packages: `ggmap` and `Nominatim`. An API key is required to geocode for each package ([Google Maps](https://mapsplatform.google.com) for `ggmap` and [MapQuest](https://developer.mapquest.com) for `Nominatim`). As the locations are quite precise, there are often errors in the coordinates returned by geocoding, which is why we used two packages by selecting the most reasonable coordinates. It is still possible to have some deviations between the city and the place shown on the map, but the latter should not be greater than a degree of longitude and latitude. 
 
-In Figure \@ref(fig:location), accidents are represented in clusters which are scattered by zooming. For each accident, information is available such as the model, the manufacturer, the date or the time. Note that 11 more accidents have been compared to the last map. The reason is that the location has not been identified. 
+In Figure \@ref(fig:location), accidents are represented in clusters which are scattered by zooming. For each accident, information is available such as the model, the manufacturer, the date or the time. Note that 11 more accidents have been removed compared to the last map. The reason is that the location has not been identified. 
 
 ```{r location, fig.cap="Number of accidents from 2006 to 2015 clustered by location in Brazil", echo=FALSE}
 
@@ -239,9 +239,7 @@ cluster
 
 ```
 
-We notice the same thing again ... 
-
-Table 2 represents the ten cities with the most accidents. 
+We still notice the same thing, that is to say a concentration of accidents in the Southeast Region of Brazil. This is explained by the fact that the traffic there is the most dense, as this article confirms in particular [@airtraffic]. It turns out that some cities are noteworthy in terms of the number of accidents. Table 2 represents the ten cities with the most accidents. 
 
 ```{r, results='asis', echo=FALSE}
 
@@ -249,7 +247,9 @@ stargazer(cities, type = "html", title = "Table 2: Top ten cities with the highe
 
 ```
 
-The observation remains the same: these are the largest cities in Brazil, each having the largest airports in the country with the most air traffic.  
+A demographic explanation is still reasonable. The first six cities in Table 2 are among the ten most populous cities in Brazil [@cities]. Moreover, they also have airports on the list of the 20 busiest airports in Brazil [@airports]. 
+
+Looking more closely at the accidents in these cities, we see that all kinds of aircraft are represented, whether they are airliners, tourist planes or even helicopters. To learn more in this direction, it is possible to explore the accidents on the map (Figure \@ref(fig:location)). 
 
 
 ## Lifetime of aircraft
@@ -373,4 +373,5 @@ We employed linear, logistic and quantile regression to investigate the associat
 
 
 <div id="refs"></div>
+
 
