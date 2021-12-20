@@ -48,18 +48,18 @@ Here are some more specific questions arising from the main problem that we will
 
 - What about the characteristics of the aircraft? Is the model, the mass or the number of engines take a part in causing a crash?
 
-- What are the main occurrence types or cause of accidents? 
+- What are the main occurrence types or causes of accidents? 
 
-- What can we say about damage severity of the accidents? Are there correlations?
+- What can we say about damage severity of the accidents? Are there any correlations?
 
 ### Approaches
 
-We employed linear, logistic and quantile regression to investigate the association between aircraft lifetime, accident severity and damage level.
+- We represented accidents by state in Brazil in order to visualize their distribution. To go deeper, we used some $\textsf{R}$ packages for geocoding (the data having only the name of the places, but not the geographical coordinates) in order to represent each accident on a map.  
+
+- We employed linear, logistic and quantile regression to investigate the association between aircraft lifetime, accident severity and damage level.
 
 
 ## Sources of information / datasets
-
-
 
 ````{r packages, include=FALSE}
 library(ggplot2)
@@ -110,7 +110,7 @@ data_wo_na=drop_na(data)
 stargazer(na_count, type = "html", title = "Table 1: Repartition of NAs in the columns")
 ```
 
-The dataset is full of missing values to the point where there is no complete row. The Table (1) displays the number of missing values in each column. $Takeoff$ is the top column containing NAs, with more than 87.4% of the data missing. We see also a significant number of missing data points in the columns related to the report such as $report_number$ with more than 78.6%, $published_report$,$publication_day$ and $publication_Week$ with 51%. We can see that the data is most present for columns containing information that are independent of the accident such as $aircraft_id$, $manufacturer$ and $type_operation$.
+The dataset is full of missing values to the point where there is no complete row. The Table 1 displays the number of missing values in each column. $Takeoff$ is the top column containing NAs, with more than 87.4% of the data missing. We see also a significant number of missing data points in the columns related to the report such as $report_number$ with more than 78.6%, $published_report$,$publication_day$ and $publication_Week$ with 51%. We can see that the data is most present for columns containing information that are independent of the accident such as $aircraft_id$, $manufacturer$ and $type_operation$.
 
 ```{r, include=FALSE}
 table(data["equipment"])/(2043-1)
@@ -319,7 +319,7 @@ rownames(cities) = c("Cities", "Accidents")
 
 ```
 
-This section is devoted to the study of the places where aircraft accidents occur. Indeed, it is essential to understand where they occur in order to identify more risk factors.
+This section is devoted to the study of the places where aircraft accidents occur. Indeed, it is essential to understand this in order to identify more risk factors.
 
 First, a comparison between the Brazilian states allows us to draw a first conclusion (Figure \@ref(fig:states)). Note that accidents are cumulative over the 10-year period. 
 
@@ -329,7 +329,7 @@ fu
 
 ```
 
-All the states have less than 200 accidents, more precisely less than 170 (Rio Grande do Sul), except one state: São Paulo. This state is not larger than the others (it is rather medium in size), which indicates that there is clearly a concentration of accidents in this area. Note that ten accidents are not shown on the map Table (2). Eight of them occurred outside of Brazil and two more for other reasons: one ended up in international waters and the other does not have its location identified. 
+All the states have less than 200 accidents, more precisely less than 170 (Rio Grande do Sul), except one state: São Paulo. This state is not larger than the others (it is rather medium in size), which indicates that there is clearly a concentration of accidents in this area. Note that ten accidents are not shown on the map (Table 2). Eight of them occurred outside of Brazil and two more for other reasons: one ended up in international waters and the other does not have its location identified. 
 
 ```{r , results='asis', echo=FALSE}
 
@@ -337,7 +337,7 @@ stargazer(external, type = "html", title = "Table 2: Accidents not reprensented 
 
 ```
 
-An explanation for this observation is linked in particular to demography. Indeed, the state of São Paulo is the most populous in Brazil with more than 41 million inhabitants in 2010 [@population]. Air traffic is therefore concentrated there, especially since the largest airports of the country are located in this state (for example São Paulo Guarulhos International Airport and São Paulo Congonhas Airport). The risk of accidents is therefore higher. 
+An explanation for this observation is linked in particular to demography. Indeed, the state of São Paulo is the most populous in Brazil with more than 41 million inhabitants in 2010 [@population]. This represents more than 20% of the total population of the country. Air traffic is therefore concentrated there, especially since the largest airports of the country are located in this state (for example São Paulo Guarulhos International Airport and São Paulo Congonhas Airport). The risk of accidents is therefore higher. 
 
 To be more precise in the geographical approach, it is possible to establish a map according to the location of the accident (nearest city). As the geographic coordinates are not included in the data, it is possible to use geocoding given that the city is available. For this, we used two packages: `ggmap` and `Nominatim`. An API key is required to geocode for each package ([Google Maps](https://mapsplatform.google.com) for `ggmap` and [MapQuest](https://developer.mapquest.com) for `Nominatim`). As the locations are quite precise, there are often errors in the coordinates returned by geocoding, which is why we used two packages by selecting the most reasonable coordinates. It is still possible to have some deviations between the city and the place shown on the map, but the latter should not be greater than a degree of longitude and latitude. 
 
@@ -349,7 +349,7 @@ cluster
 
 ```
 
-We still notice the same thing, that is to say a concentration of accidents in the Southeast Region of Brazil. This is explained by the fact that the traffic there is the most dense, as this article confirms in particular [@airtraffic]. It turns out that some cities are noteworthy in terms of the number of accidents. Table (3) represents the ten cities with the most accidents. 
+We still notice the same thing, that is to say a concentration of accidents in the Southeast Region of Brazil. This is explained by the fact that the traffic there is the most dense, as this article confirms in particular [@airtraffic]. It turns out that some cities are noteworthy in terms of the number of accidents. Table 3 represents the ten cities with the most accidents. 
 
 ```{r, results='asis', echo=FALSE}
 
@@ -357,14 +357,14 @@ stargazer(cities, type = "html", title = "Table 3: Top ten cities with the highe
 
 ```
 
-A demographic explanation is still reasonable. The first six cities in Table (3) are among the ten most populous cities in Brazil [@cities]. Moreover, they also have airports on the list of the 20 busiest airports in Brazil [@airports]. 
+A demographic explanation is still reasonable. The first six cities in Table 3 are among the ten most populous cities in Brazil [@cities]. Moreover, they also have airports on the list of the 20 busiest airports in Brazil [@airports]. 
 
-Looking more closely at the accidents in these cities, we see that all kinds of aircraft are represented, whether they are airliners, tourist planes or even helicopters. To learn more in this direction, it is possible to explore the accidents on the map (Figure \@ref(fig:location)). 
+Looking more closely at the accidents in these cities, we see that all kinds of aircraft are represented, whether they are airliners, tourist planes or even helicopters. To learn more in this direction, it is possible to further explore the accidents on the map (Figure \@ref(fig:location)). 
 
 
-## Time analysis: 
+## Time analysis
 
-###Visualisation:
+### Visualization
 ```{r, include=FALSE}
 data = read_csv("../Data/aircrafts_occurrences_merged.csv") 
 
@@ -399,7 +399,7 @@ hist(Time_Occurence_publication,main="Distribution of time difference: occurance
 ```
 In Figure \@ref(fig:Occurancepublication) are displayed the distribution of time difference in days between the occurance day and publication day. It can be seen that most of crashes are reported the same year. The longest time difference is of 3589 days. It was for a political operation caused by a loss of control in the air in year 1986 in Brazil. 
 
-###Lifetime of aircraft:
+### Lifetime of aircraft
 
 ```{r include=FALSE}
 df.age <- read_csv("../Data/aircrafts_occurrences_merged.csv")
@@ -514,10 +514,11 @@ We do not find a strong association between accident severity and aircraft age w
 
 ## Conclusion
 
-We employed linear, logistic and quantile regression to investigate the association between aircraft lifetime, accident severity and damage level, but did not find any statistically significant associations.
+- By visualizing the accidents on a map, we found that there is a concentration of accidents in the state of São Paulo, or more generally in the whole Southeast Region of Brazil. The possible explanations are linked to demography or the high density of air traffic. As air activity is higher in these areas, the risk of an accident to occur increases. 
+
+- We employed linear, logistic and quantile regression to investigate the association between aircraft lifetime, accident severity and damage level, but did not find any statistically significant associations.
 
 ## Future improvements
-
 
 <div id="refs"></div>
 
