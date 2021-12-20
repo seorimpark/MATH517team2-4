@@ -7,7 +7,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-pacman::p_load(tidyverse, pacman, ggmap, ggplot2, GGally, lubridate, raster,gganimate)
+pacman::p_load(tidyverse, pacman, ggmap, ggplot2, GGally, lubridate, raster,gganimate, fastDummies)
 ```
 
 ```{r}
@@ -20,14 +20,160 @@ str(data)
 data %>% dplyr::select(damage_level, classification) %>% table()
 ```
 
-Due to the fact that the destroyed cases are counted as accident rather than serious incident, we decide to use the variable `damage_level` as the target for both regression and classification.
+As shown above, the destroyed cases are counted as accident rather than serious incident, which seems to be a contradiction. By inspecting the source website [Brazilian Open Data's official website](http://dados.gov.br/dataset/ocorrencias-aeronauticas-da-aviacao-civil-brasileira) Incidents are classified as `Acidentes` and `Incidentes graves` (Spanish) in their official report. Hence we decide to use the classification variable as our dependent variable. 
 
-Create dummy nodes 
+Create dummy nodes for independent categorical vars.
+```{r}
+mydata <- data %>% mutate(occurrence_year = as.numeric(format(as.Date(occurrence_day), format = "%Y"))) %>% dplyr::select(equipment, manufacturer, engine_type, engines_amount, "takeoff_max_weight..Lbs.", seatings_amount, year_manufacture, registration_category, registration_aviation, operation_phase, type_operation, fu, occurrence_year, classification) 
+write.csv(mydata, "temp_for_py.csv")
+
+# Transform categorical variable, if more than x classes -> Others.
+cat_var <- c("equipment", "manufacturer", "engine_type", "registration_category", "registration_aviation", "operation_phase", "type_operation", "fu")
+
+#  dynamic naming not working! 
+# for (i in cat_var){
+#   temp <- mydata %>% dplyr::select(i) %>% table() %>% 
+#         as.data.frame() %>% 
+#         arrange(desc(Freq))
+#   slice_at <- which(!(temp %>% pull() >= 5))[1] # will gather together if cell count < 5
+#   if (is.na(slice_at | slice_at > 10)) {
+#     slice_at = 10
+#   }
+#   if (length(temp %>% pull()) >= slice_at) {
+#     to_keep <- temp %>% slice(1:slice_at-1)
+#     newname <- paste(i,1, sep = "_")
+#     mydata <- mydata %>% mutate(!!i := if_else(i %in% to_keep$., i, "Others"))
+#   }
+# }
+# 
+
+
+# mydata$i <- ifelse(mydata$i %in% to_keep$., i, "Others")  # not working
+# # Testing
+# temp <- data %>% dplyr::select(equipment) %>% table()%>% 
+#         as.data.frame() %>% 
+#         arrange(desc(Freq)) 
+# 
+# slice_at <- which(!(temp %>% pull() >= 5))[1] # will gather together if cell count < 5
+# if (is.na(slice_at)) {
+#   slice_at = 10
+# }
+# 
+# if (length(temp %>% pull()) >= slice_at) {
+#   to_keep <- temp %>% slice(1:slice_at-1)
+#   data %>% mutate(equipment = if_else(equipment %in% to_keep$., equipment, "Others"))
+#   # C = if_else(A == B, A + B, A - B)
+# }
+# 
+# mydata %>% summary()
+# 
+# for (i in cat_var){
+#   print(i)
+#   temp <- mydata %>% dplyr::select(i) %>% table() %>% 
+#         as.data.frame() %>% 
+#         arrange(desc(Freq))
+#   print(temp)
+# }
+# 
+# # Test fu
+# cat_var <- c("fu")
+# for (i in cat_var){
+#   temp <- mydata %>% dplyr::select(i) %>% table() %>% 
+#         as.data.frame() %>% 
+#         arrange(desc(Freq))
+#   slice_at <- which(!(temp %>% pull() >= 5))[1] # will gather together if cell count < 5
+#   if (is.na(slice_at) | slice_at >= 10) {
+#     slice_at = 10
+#   }
+#   if (length(temp %>% pull()) >= slice_at) {
+#     to_keep <- temp %>% slice(1:slice_at-1)
+#     mydata <- mydata %>% dplyr::select(i) %>% mutate(!!i := if_else(i %in% to_keep$., i, "Others")) %>% table()
+#   }
+# }
+```
+
+```{r}
+data %>% dplyr::select(classification)
+```
+
+
+## Read CSV
+```{r}
+library(randomForest)
+
+df =read_csv("for_colab.csv") %>% drop_na()
+names(df) <- make.names(names(df))
+fit <- randomForest(classification ~ .,   data=df)
+print(fit) # view results
+importance(fit) # importance of each predictor
+
+mylogit <- glm(classification ~ engines_amount + `takeoff_max_weight..Lbs.` + seatings_amount + year_manufacture +  `occurrence_year` +`manufacturer_...`+`manufacturer_AERO.BOERO`+`manufacturer_BEECH.AIRCRAFT`+`manufacturer_CESSNA.AIRCRAFT`+`manufacturer_EMBRAER`+`manufacturer_HELIBRAS`+`manufacturer_NEIVA.INDUSTRIA.AERONAUTICA`+`manufacturer_Others`+`manufacturer_PIPER.AIRCRAFT`+`manufacturer_ROBINSON.HELICOPTER`+`engine_type_JET`+`engine_type_PISTON`+`engine_type_TURBOPROP`+`engine_type_TURBOSHAFT`+`engine_type_UNKNOWN`+`registration_category_ADE`+`registration_category_EXT`+`registration_category_Others`+`registration_category_PET`+`registration_category_PIN`+`registration_category_PRI`+`registration_category_SAE`+`registration_category_SAE.AG`+`registration_category_TPP`+`registration_category_TPR`+`registration_aviation_SPECIALIZED`+`registration_aviation_UNKNOWN`+`operation_phase_ASCENSION`+`operation_phase_CRUISE`+`operation_phase_DESCEND`+`operation_phase_FINAL.APPROXIMATION`+`operation_phase_LANDING`+`operation_phase_MANEUVER`+`operation_phase_Others`+`operation_phase_RUN.AFTER.LANDING`+`operation_phase_SPECIALIZED`+`operation_phase_TAKEOFF`+`type_operation_AEROTAXI`+`type_operation_AGRICULTURAL`+`type_operation_EXPERIMENTAL`+`type_operation_INSTRUCTION`+`type_operation_NOT.REGULAR`+`type_operation_POLICIAL`+`type_operation_PRIVATE`+`type_operation_REGULAR`+`type_operation_SPECIALIZED`+`fu_AM`+`fu_BA`+`fu_GO`+`fu_MG`+`fu_MT`+`fu_Others`+`fu_PA`+`fu_PR`+`fu_RJ`+`fu_RS`, data = df, family = "binomial")
+summary(mylogit)
+# library(sjPlot)
+tab_model(mylogit, digits.p = 2, transform = NULL)
+require(rms)
+# mod1b <- lrm(classification ~ engines_amount + `takeoff_max_weight..Lbs.` + seatings_amount + year_manufacture , data = df)
+print(mod1b)
+# vif
+myvif = car::vif(mylogit)
+myvif > 10
+
+# outliners
+plot(mylogit, which = 4, id.n = 3)
+library(broom)
+model.data <- augment(mylogit) %>% 
+  mutate(index = 1:n()) 
+model.data %>% top_n(3, .cooksd)
+ggplot(model.data, aes(index, .std.resid)) + 
+  geom_point(aes(color = classification), alpha = .5) +
+  theme_bw()
+
+model.data %>% 
+  filter(abs(.std.resid) > 3)
+
+# linearity
+probabilities <- predict(mylogit, type = "response")
+predicted.classes <- ifelse(probabilities > 0.5, "pos", "neg")
+head(predicted.classes)
+
+
+# # Select only numeric predictors
+# mydata <- PimaIndiansDiabetes2 %>%
+#   dplyr::select_if(is.numeric) 
+predictors <- colnames(df)
+# Bind the logit and tidying the data for plot
+mydata <- df %>%
+  mutate(logit = log(probabilities/(1-probabilities))) %>%
+  gather(key = "predictors", value = "predictor.value", -logit) 
+
+mydata = mydata %>% filter(!(predictors == "classification"))
+
+ggplot(mydata, aes(logit, predictor.value))+
+  geom_point(size = 0.5, alpha = 0.5) +
+  geom_smooth(method = "loess")+
+  theme_bw() + 
+  facet_wrap(~predictors, scales = "free_y")
+
+```
 
 
 
+```{r}
+data = data %>% drop_na()
+pca_arrests = princomp(data)
+library(ggbiplot)
+library(plotly)
+p1 = ggscreeplot(pca_arrests) +
+  theme_bw(base_size = 20) + labs(y = "Prop. of explained variance")
+p2 = ggscreeplot(pca_arrests,type = "cev") + theme_bw(base_size = 20) + labs(y = " Cumulative prop. of explained variance")
+ggplotly(p2)
+gridExtra::grid.arrange(p1, p2, ncol=2)
 
 
+ggbiplot(pca_arrests, labels =  rownames(df), labels.size = 3, varname.size = 5) +
+  theme_bw(base_size = 20) + coord_cartesian(ylim = c(-2.5,2.5), xlim = c(-2.5,2.5))
+
+```
 
 
 
