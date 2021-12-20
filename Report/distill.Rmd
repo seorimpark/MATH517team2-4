@@ -228,7 +228,8 @@ brazil_fu = data.frame(table(brazil_fu$fu))
 colnames(brazil_fu) = c("fu", "accidents")
 
 # Brazilian states
-states <- read_state(year=2019)
+#states <- read_state(year=2019)
+states <- readRDS("states.rds")
 
 # Join the databases
 states <- dplyr::left_join(states, brazil_fu, by = c("abbrev_state" = "fu"))
