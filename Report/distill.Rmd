@@ -54,13 +54,10 @@ Here are some more specific questions arising from the main problem that we will
 
 ### Approaches
 
-- We represented accidents by state in Brazil in order to visualize their distribution. To go deeper, we used some $\textsf{R}$ packages for geocoding (the data having only the name of the places, but not the geographical coordinates) in order to represent each accident on a map.  
-
-- We employed linear, logistic and quantile regression to investigate the association between aircraft lifetime, accident severity and damage level.
-
-- We made pie charts to see the shares between each categories of each features. Also, we checked if some columns were highly correlated to each other.
-
-- After transforming categorical data to numerical data by getting dummy variables, we performed decision tree and logistic regression to find a good prediction of the accident severity.
+To answer our question, we first represented the accidents by state in Brazil to visualize their distribution. To go further, we used $\textsf{R}$ packets for geocoding (data with only place names, but no geographic coordinates) to represent each accident on a map.  
+We then turned to the temporal analysis. For this, we first made a visual approach and then an analytical one through a linear, logistic and quantile regression in order to study the association between the life of the aircraft, the severity of the accident and the level of damage.
+In addition, we made pie charts to see the shares between each category of each characteristic. We also checked whether some columns were highly correlated with each other.
+Finally, we wanted to find a good prediction of crash severity. To do this, the categorical data were transformed into numerical data by obtaining dummy variables and we performed a decision tree and logistic regression.
 
 ## Sources of information / datasets
 
@@ -127,6 +124,7 @@ library(readr)
 library(quantreg)
 library(latex2exp)
 library(lubridate)
+library(knitr)
 ````
 
 ```{r,include=FALSE}
