@@ -155,7 +155,7 @@ data_wo_na=drop_na(data)
 ```
 
 ```{r ,  results='asis', echo=FALSE}
-stargazer(na_count, flip=FALSE, type = "html", title = "Table 1: Repartition of NAs in the columns")
+stargazer(na_count, flip=TRUE, type = "html", title = "Table 1: Repartition of NAs in the columns")
 ```
 
 The dataset is full of missing values to the point where there is no complete row. The Table 1 displays the number of missing values in each column. $Takeoff$ is the top column containing NAs, with more than 87.4% of the data missing. We see also a significant number of missing data points in the columns related to the report such as $report_number$ with more than 78.6%, $published_report$,$publication_day$ and $publication_Week$ with 51%. We can see that the data is most present for columns containing information that are independent of the accident such as $aircraft_id$, $manufacturer$ and $type_operation$.
