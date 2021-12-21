@@ -4,65 +4,96 @@ author: "yiren"
 date: "20/12/2021"
 output: html_document
 ---
-```{r}
+```{r, include = FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 pacman::p_load(tidyverse, pacman, ggmap, ggplot2, GGally, lubridate, raster,gganimate, fastDummies)
 
 ```
 
+(APPROACH)
 
-Decision Tree
+- After transforming categorical data to numerical data by getting dummy variables, we performed decision tree and logistic regression to find a good prediction of the accident severity.
+
+(Conclusion)
+- Overall, for predicting accident severity, due to a small $R^2$ in logistic regression and a relatively satisfying 75% accuracy from decision tree, we prefer decision tree over logistic regression as our predictive model. Moreover, we would like to perform unsupervised learning DBSCAN to cluster the data points. Before doing so, we need to use PCA to prevent the curse of dimensionality.
+
+(Future improvements)
+Currently, we have too many categorical variables in our dataset. Affected by the limit of our machine learning techniques, we mainly use numerical variables while building up predictive model, hence we have to transform those categorical variables into numerical ones by adding lots of dummy variables. However, after transformation, the dimension becomes extremely large. We would like to perform clustering but we have to reduce the dimension first. However, the result of PCA shows that we cannot use this technique to reduce the dimension sufficiently and still make sure it contains most of the information in the dataset. Hence we require a larger dataset with more observations. Currently we are using Brazilian Aeronautics Accidents in 10 years. So it is possible to enlarge our dataset by expanding our investigation to a longer period as well as study more countries.
+
+
+## Causes of severe accidents vs minor incident
+
+### Transform Categorical Variables into Numerical Variables
+To predict the severe accidents vs minor incident and analyse the possible cause, we get dummy variables for each categorical variable, e.g. when one of the operation types is INSTRUCTION, we create a new column called  `type_operation_INSTRUCTION` and give it 1 if the type is INSTRUCTION, 0 otherwise. 
+
+### Decision Tree
+After getting dummies variables, we feed the dataset to our decision tree predictive model and obtain the following result. 
 
 <img src="decision_tree_depth2.svg" alt="drawing" width="80%"/>
 
+When the `engines_amount` is greater than 1.5 and the `takeoff_max_weight..Lbs.` is larger than 14770.5, the accident will be more likely to be severe.
+
 <img src="cross_ validation_decision_tree.png" alt="drawing" width="80%"/>
 
-The depth-2 tree achieves the best mean cross-validation accuracy 74.94988 +/- 1.62372% on training dataset.
+By performing cross validation, we find the depth-2 tree achieves the best mean cross-validation accuracy 74.94988 +/- 1.62372%.
 
-Logistic Regression
+## Logistic Regression
 
-```{r}
+```{r, echo = FALSE}
 knitr::include_url("incident_raw_logistic_result.html", height = "500px")
 ```
 
-For linearity, due to there are so many plots, we choose not to 
+Logistic regression shows that the increases in `engines amount`, `occurrence year`, `registration category EXT`, `registration category PIN`, `registration category PRI`, `registration category TPR`, `operation phase RUN AFTER LANDING` or `fu PA` will increase the log odds of getting severe incident, while increases in `engine type PISTON`, `operation phase FINAL APPROXIMATION`, `operation phase MANEUVER` or `operation phase Others` will decrease the log odds of getting severe incident.
+
+### Assumption Checking
+
+#### 1. Linearity
 
 <img src="linearity.png" alt="drawing" width="80%"/>
 
-As shown, 
+As shown, most of variables has linearity, except that `registration_category_PRI` and `registration_phase_RUN_AFTER_LANDING` seem to be poor at linearity and might require further data transformation.
 
 
-## Multicollinearity
-```{r}
+#### 2. No Multicollinearity
+```{r, echo = FALSE}
 load("assumption.RData")
 myvif
 ```
- 
+
 To satisfy collinearity assumption, we make sure all VIF value are less than 10. We manually removed the variables with VIFs greater than 10.
 
 
-## Outliers
-```{r}
-plot(mylogit, which = 4, id.n = 3)
+#### 3. No Influential Observations
+
+Here are the VIF values for each variable.
+
+```{r, echo = FALSE}
 library(broom)
+plot(mylogit, which = 4, id.n = 3)
+```
+
+In the Cook's distance plot, outliners in the dataset are presented and the 3 largest distance values are labelled which require us to further explore them.
+
+
+```{r, echo = FALSE}
 model.data <- augment(mylogit) %>% 
   mutate(index = 1:n()) 
 model.data %>% top_n(3, .cooksd)
+```
+
+The 3 most extreme observations are shown as above.
+
+
+```{r, echo = FALSE}
 ggplot(model.data, aes(index, .std.resid)) + 
   geom_point(aes(color = classification), alpha = .5) +
   theme_bw()
-
-model.data %>% 
-  filter(abs(.std.resid) > 3)
 ```
 
 To filter outliners, we try searching for the points with absolute value of standard residual to be greater than 3, we find no such points in our dataset hence there is no influential observations.
 
 
-
-
-Due to a small R^2, we prefer decision tree over logistic regression. Moreover, we would like to perform unsupervised learning DBSCAN to cluster the data points. Before doing so, we need to use PCA to prevent the curse of dimensionality.
-
-
-
 http://www.sthda.com/english/articles/36-classification-methods-essentials/148-logistic-regression-assumptions-and-diagnostics-in-r/
+
+
+
