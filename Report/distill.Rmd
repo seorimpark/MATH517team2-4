@@ -61,6 +61,53 @@ Here are some more specific questions arising from the main problem that we will
 
 ## Sources of information / datasets
 
+The dataset used in this report is from  [Kaggle](https://www.kaggle.com/paulovasconcellos/aeronautics-accidents-in-brazil) provided by the CENIPA (Centro de Investigação e Prevenção de Acidentes aeronáuticos, [Brazilian Open Data](https://dados.gov.br/dataset/ocorrencias-aeronauticas-da-aviacao-civil-brasileira)). The given dataset contains two files (`aircrafts.csv' and `occurrences.csv'), but merging them based on the unique occurrence ID ($occurrence\_id$) for each aircrafts was possible, so the latter one (`aircrafts_occurrences_merged.csv') was used to analyse the different occurrences from the aircrafts. 
+
+The file contains different information about the aircraft and the accident. First of all, the dataset contains several columns about the features of the aircrafts which encountered accidents:
+
+* $aircraft_id$ - Aircraft's identification number
+* $registration$ - Aircraft's registration number
+* $operator\_id$ - Operator's identification number
+* $equipment$ - Type of the aircraft (Airplane, Helicopter, Glider, Ultralight, Amphibious, Airship). Some of them are unknown.
+* $manufacturer$ - Name of the manufacturer of the aircraft
+* $model$ - Name of the model of the aircraft
+* $engine\_type$ - Type of the engine
+* $engines\_amount$ - Amount of the engine (it goes from 0 to 4)
+* $takeoff\_max\_weight (Lbs)$ - Maximum weight that the aircraft can hold for the takeoff
+* $seatings\_amount$ - Number of available seats of the aircraft
+* $year\_manufacture$ - Year when the aircraft was built
+* $registration\_country$ - Country in which the aircraft was registered (mostly Brazil, but also some other neighboring countries)
+* $registration\_category$ - Aircraft's registration category at the moment of the occurrence
+* $registration\_aviation$ - Aircraft's aviation category at the moment of the occurrence
+* $origin\_flight$ - Location of the departure of the flight.
+* $destination\_flight$ - Planned destination of the flight.
+* $operation\_phase$ - Operation phase at the moment of the occurrence
+* $type\_operation$ - Type of operation at the moment of the occurrence
+* $damage\_level$ - Level of damage of the aircraft, there are four levels (None, Light, Substantial, Destroyed). Some of them are unknown.
+* $fatalities\_amount$ - Number of fatalities from the accident. 
+* $extraction\_day$ - Date when the data was collected.
+
+Then, the dataset also contains columns about the occurrences: 
+* $classification$ - Degree of seriousness of the accident (serious incident or accident)
+* $type\;of\;occurrence$ - Type of accident 
+* $localization$ - City where the occurrence happened
+* $fu$ - State where the occurrence happened
+* $country$ - Country where the occurrence happened (mostly Brazil, but also some other neighboring countries)
+* $aerodrome$ - Aerodrome's ICOA code
+* $occurrence\_day$ - Occurrence date
+* $time$ - Time of the occurrence (UTC)
+* $under\_investigation$ - If the accident is or went under investigation (Yes, no or unknown)
+* $investigating\_command$ - Investigation command responsible for the occurrence investigation
+* $investigation\_status$ - Status of the investigation
+* $report\_number$ - Final report's identification number
+* $published\_report$ - If the report was published (If yes, 1)
+* $publication\_day$ - Publication day of the report
+* $recommendation\_amount$ - Security recommendation quantity emitted
+* $aircrafts\_involved$ - Quantity of aircrafts involved in the occurrence
+* $takeoff$ - 
+* $extraction_day$ - the date when the data was collected.
+
+
 ````{r packages, include=FALSE}
 library(ggplot2)
 library(geobr)
@@ -511,6 +558,53 @@ exp(cbind(OR = coef(fit.logistic), confint(fit.logistic)))
 ```
 
 We do not find a strong association between accident severity and aircraft age within the stratum of helicopters either (the confidence interval for the lifetime coefficient includes the null-value, and the p-value of the coefficient is 0.227).
+
+## Features of the aircrafts, possible source of accidents
+
+### Occurence type
+
+### Other features
+
+Different features of aircrafts are presented in the dataset, and some types of them might have caused the most accidents among all. An interactive plot ([link](https://aircraftaccteam2.herokuapp.com)) involving pie charts of the number of counts of different features is made to compare and determine which types of features have the most occurrences. The columns $equipment$, $manufacturer$, $model$, $engine_type$, $engines_amount$, $registration_aviation$, $operation_phase$, $type_operation$. 
+
+##### (Different screenshots of the pie charts and short analysis (the largest&trend))
+
+The correlation between the different features is interesting to observe, since we can omit certain columns to analyse the type of the features of aircrafts that encountered the most accidents. However there are some subtleties in analyzing the correlation because the variables are categorical. As most of the variables are not ordered, several columns suspected to be correlated are chosen. 
+
+The aim is to see if between the two chosen columns, one is a further classification of the other one. For instance, we want to check if aircrafts of the same model are from the same manufacturer. In other words, we want to check if the column $model$ is a further classification of the column $manufacturer$. Mainly, we want to check if the aircraft models have a certain type of fixed features, because if they are, those features can be omitted and the information about the model is enough for the analysis.
+
+To check, let A and B the columns. Then the count of categories of A is counted for each categories of B, and the sum of the number of outliers (all counts except the largest count from A) is computed. We made several hypotheses and checked if they were correct: 
+
+* Are the aircrafts from the same model belonging to the same type of aircraft?
+* Do the aircrafts from the same model come from the same manufacturers?
+* Do the aircrafts from the same model have the same maximum weight for the takeoff?
+* Do the aircrafts from the same model have the same number of available seatings?
+* Do the aircrafts from the same model have the same number of engines?
+* Do the aircrafts from the same model have the same type of engines?
+* Do the aircrafts from the same model registered as to have the same purpose?
+
+
+```{r , results='asis', echo=FALSE}
+A=c("equipment", "manufacturer","takeoff_max_weight (Lbs)", "seatings_amount", "engines_amount", "engine_type","registration_aviation")
+B=c("model","model","model","model","model","model","model")
+Number_of_outliers=c(7,92,173,211,5,8,392)
+corr=data.frame(A,B,Number_of_outliers)
+
+stargazer(corr, type = "html", title = "Table 4: the pair of columns chosen and its number of outliers")
+
+```
+
+Table 4 shows the number of outliers computed from each pairs of columns. We can observe that on one hand, there are several columns that are indeed highly correlated to the model, such as the type of aircraft, the amount of engines and the type of engines. On the other hand, there are columns that do not often match with the one of the model: the $registration_aviation$ has the most outliers among all. We can conclude that although some columns can be omitted, the others are still important to consider. For instance, for $registration_aviation$, almost 20\% of the cases are outliers, for $takeoff_max_weight (Lbs)$ and $seatings_amount$ about 10\% are outliers, and for $manufacturer$ about 5\% are outliers. We can see that quite often the aircrafts users changed some features from the original aircraft model. 
+
+The maximum weight for the takeoff and the number of available seats of the aircrafts have also been used for the analysis. 
+
+##### Different plots
+
+Figure  is a scatter plot of the count of the accidents of each the maximum weights. We can observe that
+
+Figure  is a scatter plot of the count of the accidents of each number of available seatings.
+
+##### include analysis about the fatalities? or give this part to someone else
 
 ## Conclusion
 
