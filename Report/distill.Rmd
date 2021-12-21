@@ -703,9 +703,14 @@ As shown, most of variables has linearity, except that `registration_category_PR
 
 
 #### 2. No Multicollinearity
-```{r, echo = FALSE}
+```{r, echo = FALSE, results='asis', warning=FALSE, message = FALSE}
 load("assumption.RData")
-myvif
+library(stargazer)
+
+test<- t(myvif %>% data.frame() %>% mutate(across(where(is.numeric), ~ round(., 2))))
+stargazer(test, type = "html",flip=TRUE, title = "VIF Value for Each Variable")
+
+
 ```
 
 To satisfy collinearity assumption, we make sure all VIF value are less than 10. We manually removed the variables with VIFs greater than 10 [@yc2].
