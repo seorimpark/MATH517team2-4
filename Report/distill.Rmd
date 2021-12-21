@@ -669,9 +669,9 @@ As a result, we cannot conclude on the possibility of occurrences on the feature
 
 ##### include analysis about the fatalities? or give this part to someone else
 
-## Causes of severe accidents vs minor incident
+## Causes of severe accidents
 
-### Transform Categorical Variables into Numerical Variables
+#### Transform Categorical Variables into Numerical Variables
 To predict the severe accidents vs minor incident and analyse the possible cause, we get dummy variables for each categorical variable, e.g. when one of the operation types is INSTRUCTION, we create a new column called  `type_operation_INSTRUCTION` and give it 1 if the type is INSTRUCTION, 0 otherwise. 
 
 ### Decision Tree
@@ -685,7 +685,7 @@ When the `engines_amount` is greater than 1.5 and the `takeoff_max_weight..Lbs.`
 
 By performing cross validation, we find the depth-2 tree achieves the best mean cross-validation accuracy 74.94988 +/- 1.62372%.
 
-## Logistic Regression
+### Logistic Regression
 
 ```{r, echo = FALSE}
 knitr::include_url("incident_raw_logistic_result.html", height = "500px")
