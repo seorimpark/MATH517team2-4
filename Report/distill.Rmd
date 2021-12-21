@@ -36,9 +36,8 @@ Modern society has been become increasingly dependent on the use of airplanes du
 
 ### Research questions
 
-The main issue is to understand the factors that favor a plane crash, especially in Brazil in a 10-year period. Similarities between the accidents will be sought. Perhaps would it be possible to identify risk factors thereby improving passenger safety? 
-
-Here are some more specific questions arising from the main problem that we will try to answer: 
+The main goal of this project is to answer the following question: 
+What are the main risk factors that led to a plane crash in Brazil in a 10-year period. Similarities between the accidents will be sought. Here are some more specific questions arising from the main problem that we will try to answer: 
 
 - How are the accidents distributed on a map? Are there areas where accidents are more concentrated? 
 
@@ -61,7 +60,7 @@ Finally, we wanted to find a good prediction of crash severity. To do this, the 
 
 ## Sources of information / datasets
 
-The dataset used in this report is from  [Kaggle](https://www.kaggle.com/paulovasconcellos/aeronautics-accidents-in-brazil) provided by the CENIPA (Centro de Investigação e Prevenção de Acidentes aeronáuticos, [Brazilian Open Data](https://dados.gov.br/dataset/ocorrencias-aeronauticas-da-aviacao-civil-brasileira)). The given dataset contains two files (`aircrafts.csv' and `occurrences.csv'), but merging them based on the unique occurrence ID ($occurrence\_id$) for each aircrafts was possible, so the latter one (`aircrafts_occurrences_merged.csv') was used to analyse the different occurrences from the aircrafts. 
+The dataset used in this report is from  [Kaggle](https://www.kaggle.com/paulovasconcellos/aeronautics-accidents-in-brazil) provided by the CENIPA (Centro de Investigação e Prevenção de Acidentes aeronáuticos, [Brazilian Open Data](https://dados.gov.br/dataset/ocorrencias-aeronauticas-da-aviacao-civil-brasileira)). The given dataset contains two files (`aircrafts.csv` and `occurrences.csv`), but merging them based on the unique occurrence ID ($occurrence\_id$) for each aircrafts was possible, so the latter one (`aircrafts_occurrences_merged.csv`) was used to analyse the different occurrences from the aircrafts. 
 
 The file contains different information about the aircraft and the accident. First of all, the dataset contains several columns about the features of the aircrafts which encountered accidents:
 
@@ -94,7 +93,7 @@ Then, the dataset also contains columns about the occurrences:
 * $localization$ - City where the occurrence happened
 * $fu$ - State where the occurrence happened
 * $country$ - Country where the occurrence happened (mostly Brazil, but also some other neighbouring countries)
-* $aerodrome$ - Aerodrome's ICOA code
+* $aerodrome$ - Aerodrome's ICAO code
 * $occurrence\_day$ - Occurrence date
 * $time$ - Time of the occurrence (UTC)
 * $under\_investigation$ - If the accident is or went under investigation (Yes, no or unknown)
@@ -105,8 +104,8 @@ Then, the dataset also contains columns about the occurrences:
 * $publication\_day$ - Publication day of the report
 * $recommendation\_amount$ - Security recommendation quantity emitted
 * $aircrafts\_involved$ - Quantity of aircrafts involved in the occurrence
-* $takeoff$ - 
-* $extraction\_day$ - the date when the data was collected.
+* $takeoff$ - If the aircraft took of (If yes, 1)
+* $extraction\_day$ - The date when the data was collected.
 
 
 ````{r packages, include=FALSE}
@@ -159,7 +158,7 @@ data_wo_na=drop_na(data)
 stargazer(na_count, flip=TRUE, type = "html", title = "Table 1: Repartition of NAs in the columns")
 ```
 
-The dataset is full of missing values to the point where there is no complete row. The Table 1 displays the number of missing values in each column. $Takeoff$ is the top column containing NAs, with more than 87.4% of the data missing. We see also a significant number of missing data points in the columns related to the report such as $report_number$ with more than 78.6%, $published_report$,$publication_day$ and $publication_Week$ with 51%. We can see that the data is most present for columns containing information that are independent of the accident such as $aircraft_id$, $manufacturer$ and $type_operation$.
+The dataset is full of missing values to the point where there is no complete row. Table 1 displays the number of missing values in each column. $Takeoff$ is the top column containing NAs, with more than 87.4% of the data missing. We see also a significant number of missing data points in the columns related to the report such as $report\_number$ with more than 78.6%, $published\_report$,$publication\_day$ and $publication\_Week$ with 51%. We can see that the data is most present for columns containing information that are independent of the accident such as $aircraft\_id$, $manufacturer$ and $type\_operation$.
 
 ```{r, include=FALSE}
 table(data["equipment"])/(2043-1)
@@ -173,12 +172,12 @@ unique(data["manufacturer"])
 ```{r, include=FALSE}
 table(data["manufacturer"])
 ```
-There are 120 unique manufacturers represented in our dataset. The top three manufacturers are the following: $NEIVA INDUSTRIA AERONAUTICA, EMBRAER and AERO BOERO$ with respectively 388, 155 and 126 planes. 
+There are 120 unique manufacturers represented in our dataset. The top three manufacturers are the following: $NEIVA$ $INDUSTRIA$ $AERONAUTICA$, $EMBRAER$ and $AERO$ $BOERO$ with respectively 388, 155 and 126 planes. 
 
 ```{r, include=FALSE}
 table(data$engine_type)/2043
 ```
-78% of the planes present in the dataset use a $ PISTON$ engine. 7% use $TURBOSHAF$ engine, 6.8% use $TURBOPROP$ and the rest $JET$, $WITHOUT TRACTION$ or unknown engines.
+78% of the planes present in the dataset use a $PISTON$ engine. 7% use $TURBOSHAF$ engine, 6.8% use $TURBOPROP$ and the rest $JET$, $WITHOUT$ $TRACTION$ or unknown engines.
 
 ```{r NbrEng, fig.cap="Distribution of the number of engines",echo=FALSE}
 hist(data$engines_amount,main="Distribution of the number of engines.", xlab="Number of engines")
@@ -188,8 +187,8 @@ hist(data$engines_amount,main="Distribution of the number of engines.", xlab="Nu
 ```{r,include=FALSE}
 table(data$engines_amount)/(2043-9)
 ```
-Considering Figure \@ref(fig:NbrEng), 73.25% of planes use a single engine. 24% of planes use two engines. The rest of planes have either 3 or 4 engines. We believe that 0 refers to unknown data although there was no mention of it in the data description.
 
+Considering Figure \@ref(fig:NbrEng), 73.25% of planes use a single engine. 24% of planes use two engines. The rest of planes have either 3 or 4 engines. We believe that 0 refers to unknown data although there was no mention of it in the data description.
 
 ```{r distWeight,fig.cap="Distribution of take off max weight (in Lbs)", echo=FALSE}
 data_weight_no_zero=data
@@ -238,7 +237,6 @@ Concerning the damage, 72.6% of crashes were classified as $accident$ and the re
 hist(data$fatalities_amount, breaks=50, main= "Distribution of fatalities", xlab="fatalities")
 ```
 In Figure \@ref(fig:distFat) is displayed the number the fatalities. It can be seen that most of the crashes involve less than 20 deaths. The deadliest crash was in a private helicopter in 1999 in Sau Paolo where 199 lost their life during the landing. 
-
 
 ```{r, include=FALSE}
 table(data$investigation_status)/2043
