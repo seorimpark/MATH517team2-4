@@ -630,7 +630,7 @@ By performing cross validation, we find the depth-2 tree achieves the best mean 
 knitr::include_url("incident_raw_logistic_result.html", height = "500px")
 ```
 
-Logistic regression shows that the increases in `engines amount`, `occurrence year`, `registration category EXT`, `registration category PIN`, `registration category PRI`, `registration category TPR`, `operation phase RUN AFTER LANDING` or `fu PA` will increase the log odds of getting severe incident, while increases in `engine type PISTON`, `operation phase FINAL APPROXIMATION`, `operation phase MANEUVER` or `operation phase Others` will decrease the log odds of getting severe incident.
+Logistic regression shows that the increases in `engines amount`, `occurrence year`, `registration category EXT`, `registration category PIN`, `registration category PRI`, `registration category TPR`, `operation phase RUN AFTER LANDING` or `fu PA` will increase the log odds of getting severe incident, while increases in `engine type PISTON`, `operation phase FINAL APPROXIMATION`, `operation phase MANEUVER` or `operation phase Others` will decrease the log odds of getting severe incident[@yc1].
 
 ### Assumption Checking
 
@@ -647,7 +647,7 @@ load("assumption.RData")
 myvif
 ```
 
-To satisfy collinearity assumption, we make sure all VIF value are less than 10. We manually removed the variables with VIFs greater than 10.
+To satisfy collinearity assumption, we make sure all VIF value are less than 10. We manually removed the variables with VIFs greater than 10 [@yc2].
 
 
 #### 3. No Influential Observations
