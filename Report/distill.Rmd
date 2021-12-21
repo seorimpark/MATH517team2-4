@@ -50,7 +50,7 @@ Here are some more specific questions arising from the main problem that we will
 
 - What are the main occurrence types or causes of accidents? 
 
-- What can we say about damage severity of the accidents? Are there any correlations?
+- What are the causes of severe incidents?
 
 ### Approaches
 
@@ -58,6 +58,7 @@ Here are some more specific questions arising from the main problem that we will
 
 - We employed linear, logistic and quantile regression to investigate the association between aircraft lifetime, accident severity and damage level.
 
+- After transforming categorical data to numerical data by getting dummy variables, we performed decision tree and logistic regression to find a good prediction of the accident severity.
 
 ## Sources of information / datasets
 
@@ -606,14 +607,90 @@ Figure  is a scatter plot of the count of the accidents of each number of availa
 
 ##### include analysis about the fatalities? or give this part to someone else
 
+
+## Causes of severe accidents vs minor incident
+
+### Transform Categorical Variables into Numerical Variables
+To predict the severe accidents vs minor incident and analyse the possible cause, we get dummy variables for each categorical variable, e.g. when one of the operation types is INSTRUCTION, we create a new column called  `type_operation_INSTRUCTION` and give it 1 if the type is INSTRUCTION, 0 otherwise. 
+
+### Decision Tree
+After getting dummies variables, we feed the dataset to our decision tree predictive model and obtain the following result. 
+
+<img src="decision_tree_depth2.svg" alt="drawing" width="80%"/>
+
+When the `engines_amount` is greater than 1.5 and the `takeoff_max_weight..Lbs.` is larger than 14770.5, the accident will be more likely to be severe.
+
+<img src="cross_ validation_decision_tree.png" alt="drawing" width="80%"/>
+
+By performing cross validation, we find the depth-2 tree achieves the best mean cross-validation accuracy 74.94988 +/- 1.62372%.
+
+## Logistic Regression
+
+```{r, echo = FALSE}
+knitr::include_url("incident_raw_logistic_result.html", height = "500px")
+```
+
+Logistic regression shows that the increases in `engines amount`, `occurrence year`, `registration category EXT`, `registration category PIN`, `registration category PRI`, `registration category TPR`, `operation phase RUN AFTER LANDING` or `fu PA` will increase the log odds of getting severe incident, while increases in `engine type PISTON`, `operation phase FINAL APPROXIMATION`, `operation phase MANEUVER` or `operation phase Others` will decrease the log odds of getting severe incident.
+
+### Assumption Checking
+
+#### 1. Linearity
+
+<img src="linearity.png" alt="drawing" width="80%"/>
+
+As shown, most of variables has linearity, except that `registration_category_PRI` and `registration_phase_RUN_AFTER_LANDING` seem to be poor at linearity and might require further data transformation.
+
+
+#### 2. No Multicollinearity
+```{r, echo = FALSE}
+load("assumption.RData")
+myvif
+```
+
+To satisfy collinearity assumption, we make sure all VIF value are less than 10. We manually removed the variables with VIFs greater than 10.
+
+
+#### 3. No Influential Observations
+
+Here are the VIF values for each variable.
+
+```{r, echo = FALSE}
+library(broom)
+plot(mylogit, which = 4, id.n = 3)
+```
+
+In the Cook's distance plot, outliners in the dataset are presented and the 3 largest distance values are labelled which require us to further explore them.
+
+
+```{r, echo = FALSE}
+model.data <- augment(mylogit) %>% 
+  mutate(index = 1:n()) 
+model.data %>% top_n(3, .cooksd)
+```
+
+The 3 most extreme observations are shown as above.
+
+
+```{r, echo = FALSE}
+ggplot(model.data, aes(index, .std.resid)) + 
+  geom_point(aes(color = classification), alpha = .5) +
+  theme_bw()
+```
+
+To filter outliners, we try searching for the points with absolute value of standard residual to be greater than 3, we find no such points in our dataset hence there is no influential observations.
+
+
 ## Conclusion
 
 - By visualizing the accidents on a map, we found that there is a concentration of accidents in the state of São Paulo, or more generally in the whole Southeast Region of Brazil. The possible explanations are linked to demography or the high density of air traffic. As air activity is higher in these areas, the risk of an accident to occur increases. 
 
 - We employed linear, logistic and quantile regression to investigate the association between aircraft lifetime, accident severity and damage level, but did not find any statistically significant associations.
 
+- Overall, for predicting accident severity, due to a small $R^2$ in logistic regression and a relatively satisfying 75% accuracy from decision tree, we prefer decision tree over logistic regression as our predictive model. Moreover, we would like to perform unsupervised learning DBSCAN to cluster the data points. Before doing so, we need to use PCA to prevent the curse of dimensionality.
+
 ## Future improvements
 
-<div id="refs"></div>
+Currently, we have too many categorical variables in our dataset. Affected by the limit of our machine learning techniques, we mainly use numerical variables while building up predictive models, hence we have to transform those categorical variables into numerical ones by adding lots of dummy variables. However, after transformation, the dimension becomes extremely large. We would like to perform clustering but we have to reduce the dimension first. However, the result of PCA shows that we cannot use this technique to reduce the dimension sufficiently and still make sure it contains most of the information in the dataset. Hence we require a larger dataset with more observations. Currently we are using Brazilian Aeronautics Accidents in 10 years. So it is possible to enlarge our dataset by expanding our investigation to a longer period as well as study more countries.
+
 
 
