@@ -46,9 +46,9 @@ Here are some more specific questions arising from the main problem that we will
 
 - Does the age of the aircraft play a role? Are old planes more prone to accidents? 
 
-- What about the characteristics of the aircraft? Is the model, the mass or the number of engines take a part in causing a crash?
-
 - What are the main occurrence types or causes of accidents? 
+
+- What about the characteristics of the aircraft? Do certain features of the aircraft have an influence on the occurrences?
 
 - What are the causes of severe incidents?
 
@@ -57,6 +57,8 @@ Here are some more specific questions arising from the main problem that we will
 - We represented accidents by state in Brazil in order to visualize their distribution. To go deeper, we used some $\textsf{R}$ packages for geocoding (the data having only the name of the places, but not the geographical coordinates) in order to represent each accident on a map.  
 
 - We employed linear, logistic and quantile regression to investigate the association between aircraft lifetime, accident severity and damage level.
+
+- We made pie charts to see the shares between each categories of each features. Also, we checked if some columns were highly correlated to each other.
 
 - After transforming categorical data to numerical data by getting dummy variables, we performed decision tree and logistic regression to find a good prediction of the accident severity.
 
@@ -753,6 +755,8 @@ The result of pca shows that when we keep 7 dimensions, only around 40% of varia
 - By visualizing the accidents on a map, we found that there is a concentration of accidents in the state of São Paulo, or more generally in the whole Southeast Region of Brazil. The possible explanations are linked to demography or the high density of air traffic. As air activity is higher in these areas, the risk of an accident to occur increases. 
 
 - We employed linear, logistic and quantile regression to investigate the association between aircraft lifetime, accident severity and damage level, but did not find any statistically significant associations.
+
+- We did an analysis on the different features of the aircraft. Although it is hard to tell that certain type of features are more likely to encounter accidents, we could conclude that most of the accidents come from small aircrafts for private purposes. Also, certain features were mostly one of the characteristics of the model of the aircraft, so we can expect for them to be omitted.
 
 - Overall, for predicting accident severity, due to a small $R^2$ in logistic regression and a relatively satisfying 75% accuracy from decision tree, we prefer decision tree over logistic regression as our predictive model. By looking at the decision tree, we use `engines_amount` as the major factor and `type_operation_INSTRUCTION` and `takeoff_max_weight..Lbs.` as the secondary factors to predict the severity of accident.
 
