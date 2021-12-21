@@ -560,7 +560,7 @@ exp(cbind(OR = coef(fit.logistic), confint(fit.logistic)))
 
 We do not find a strong association between accident severity and aircraft age within the stratum of helicopters either (the confidence interval for the lifetime coefficient includes the null-value, and the p-value of the coefficient is 0.227).
 
-## Features of the aircrafts, possible source of accidents
+## Features of the aircrafts
 
 ### Occurence type
 
@@ -568,7 +568,57 @@ We do not find a strong association between accident severity and aircraft age w
 
 Different features of aircrafts are presented in the dataset, and some types of them might have caused the most accidents among all. An interactive plot ([link](https://aircraftaccteam2.herokuapp.com)) involving pie charts of the number of counts of different features is made to compare and determine which types of features have the most occurrences. The columns $equipment$, $manufacturer$, $model$, $engine_type$, $engines_amount$, $registration_aviation$, $operation_phase$, $type_operation$. 
 
-##### (Different screenshots of the pie charts and short analysis (the largest&trend))
+```{r equip, fig.cap="The shares of accidents coming from the same type of aircraft", echo=FALSE}
+
+include_graphics("1.png")
+
+```
+
+```{r manu, fig.cap="The shares of accidents coming from the same manufacturer", echo=FALSE}
+
+include_graphics("2.png")
+
+```
+
+```{r model, fig.cap="The shares of accidents coming from the same aircraft model", echo=FALSE}
+
+include_graphics("3.png")
+
+```
+
+```{r engtyp, fig.cap="The shares of accidents coming from the same type of aircraft engine", echo=FALSE}
+
+include_graphics("4.png")
+
+```
+
+```{r engamo, fig.cap="The shares of accidents coming from the same amount of engine", echo=FALSE}
+
+include_graphics("5.png")
+
+```
+
+```{r regav, fig.cap="The shares of accidents coming from the same registration of aviation ", echo=FALSE}
+
+include_graphics("6.png")
+
+```
+
+```{r opphase, fig.cap="The shares of accidents coming from the same operation phase", echo=FALSE}
+
+include_graphics("7.png")
+
+```
+
+```{r typop, fig.cap="The shares of accidents coming from the same type of operation", echo=FALSE}
+
+include_graphics("8.png")
+
+```
+
+Figure \@ref(fig:equip) to Figure \@ref(fig:typop) are the pie charts of the shares of different features of the aircrafts. First, certain features have a dominating one, such as the one for the type of aircraft from Figure \@ref(fig:equip) (Airplane), the one for the type of engine from Figure \@ref(fig:engtyp) (Piston), and the one for the amount of engine from Figure \@ref(fig:engamo) (1). Then there are also certain features that are more shared by different categories, but the main one is still apparent, such as the one for the aviation registration from Figure \@ref(fig:regav) (Private) and the one for the type of operation from Figure \@ref(fig:optyp) (Private). Last, some are shared by several categories, such as the one for the operation phase from Figure \@ref(fig:opphase) having Landing and Takeoff as the type phases in which the accidents occurred the most. The one for the manufacturer and the model (Figure \@ref(fig:manu) and Figure \@ref(fig:model)) are shared by multiple types of them, but we can observe that the share of the manufacturers are spread more or less equally for only certain of them, whereas the one of the model is shared more or less equally for almost all of them. We have a more dense share for the model: if we except the ones that have less than 20 counts, the amount would sum up to almost 60\%.
+
+Although there are certain types of aircraft features that encountered the most accidents, we cannot say much if they are more likely to encounter accidents than others, since we don't know the percentage among all the flights. It is highly possible that the main ones are also the most used ones, and the percentage of occurrences might not be bigger than the other ones. Therefore it is hard to conclude that the choice of certain features can be more dangerous to the passengers or not. We can still say that the most dangerous operation phase is when the aircraft is landing or taking off, since all the aircrafts go through all the phases during the operation. 
 
 The correlation between the different features is interesting to observe, since we can omit certain columns to analyse the type of the features of aircrafts that encountered the most accidents. However there are some subtleties in analyzing the correlation because the variables are categorical. As most of the variables are not ordered, several columns suspected to be correlated are chosen. 
 
@@ -597,16 +647,27 @@ stargazer(corr, type = "html", title = "Table 4: the pair of columns chosen and 
 
 Table 4 shows the number of outliers computed from each pairs of columns. We can observe that on one hand, there are several columns that are indeed highly correlated to the model, such as the type of aircraft, the amount of engines and the type of engines. On the other hand, there are columns that do not often match with the one of the model: the $registration_aviation$ has the most outliers among all. We can conclude that although some columns can be omitted, the others are still important to consider. For instance, for $registration_aviation$, almost 20\% of the cases are outliers, for $takeoff_max_weight (Lbs)$ and $seatings_amount$ about 10\% are outliers, and for $manufacturer$ about 5\% are outliers. We can see that quite often the aircrafts users changed some features from the original aircraft model. 
 
-The maximum weight for the takeoff and the number of available seats of the aircrafts have also been used for the analysis. 
+The maximum weight for the takeoff and the number of available seats of the aircrafts have also been used for the analysis. The scatter plots are made for the analysis, since we are working with categorical variables that are ordered.
 
-##### Different plots
+```{r max, fig.cap="The shares of accidents coming from the same type of operation", echo=FALSE}
 
-Figure  is a scatter plot of the count of the accidents of each the maximum weights. We can observe that
+include_graphics("9.png")
 
-Figure  is a scatter plot of the count of the accidents of each number of available seatings.
+```
+
+Figure \@ref(fig:max) is a scatter plot of the count of the accidents of each maximum weights. We can observe that the most of the accidents are from the aircrafts having lesser maximum weights. 
+
+```{r seat, fig.cap="The shares of accidents coming from the same type of operation", echo=FALSE}
+
+include_graphics("10.png")
+
+```
+
+Figure \@ref(fig:seat) is a scatter plot of the count of the accidents of each number of available seatings. Again, we can observe that most of the accidents are from the aircrafts having the least number of available seatings. 
+
+As a result, we cannot conclude on the possibility of occurrences on the features of the aircraft, but the observation made shows that most of the occurrences come from private (from Figure \@ref(fig:regav) and \@ref(fig:optyp)), small (from Figure \@ref(fig:max) and Figure \@ref(fig:seat)) aircrafts.
 
 ##### include analysis about the fatalities? or give this part to someone else
-
 
 ## Causes of severe accidents vs minor incident
 
