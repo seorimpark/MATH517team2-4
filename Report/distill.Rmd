@@ -65,7 +65,7 @@ The dataset used in this report is from  [Kaggle](https://www.kaggle.com/paulova
 
 The file contains different information about the aircraft and the accident. First of all, the dataset contains several columns about the features of the aircrafts which encountered accidents:
 
-* $aircraft_id$ - Aircraft's identification number
+* $aircraft\_id$ - Aircraft's identification number
 * $registration$ - Aircraft's registration number
 * $operator\_id$ - Operator's identification number
 * $equipment$ - Type of the aircraft (Airplane, Helicopter, Glider, Ultralight, Amphibious, Airship). Some of them are unknown.
@@ -88,11 +88,12 @@ The file contains different information about the aircraft and the accident. Fir
 * $extraction\_day$ - Date when the data was collected.
 
 Then, the dataset also contains columns about the occurrences: 
+
 * $classification$ - Degree of seriousness of the accident (serious incident or accident)
 * $type\;of\;occurrence$ - Type of accident 
 * $localization$ - City where the occurrence happened
 * $fu$ - State where the occurrence happened
-* $country$ - Country where the occurrence happened (mostly Brazil, but also some other neighboring countries)
+* $country$ - Country where the occurrence happened (mostly Brazil, but also some other neighbouring countries)
 * $aerodrome$ - Aerodrome's ICOA code
 * $occurrence\_day$ - Occurrence date
 * $time$ - Time of the occurrence (UTC)
@@ -105,7 +106,7 @@ Then, the dataset also contains columns about the occurrences:
 * $recommendation\_amount$ - Security recommendation quantity emitted
 * $aircrafts\_involved$ - Quantity of aircrafts involved in the occurrence
 * $takeoff$ - 
-* $extraction_day$ - the date when the data was collected.
+* $extraction\_day$ - the date when the data was collected.
 
 
 ````{r packages, include=FALSE}
@@ -566,7 +567,7 @@ We do not find a strong association between accident severity and aircraft age w
 
 ### Other features
 
-Different features of aircrafts are presented in the dataset, and some types of them might have caused the most accidents among all. An interactive plot ([link](https://aircraftaccteam2.herokuapp.com)) involving pie charts of the number of counts of different features is made to compare and determine which types of features have the most occurrences. The columns $equipment$, $manufacturer$, $model$, $engine_type$, $engines_amount$, $registration_aviation$, $operation_phase$, $type_operation$. 
+Different features of aircrafts are presented in the dataset, and some types of them might have caused the most accidents among all. An interactive plot ([link](https://aircraftaccteam2.herokuapp.com)) involving pie charts of the number of counts of different features is made to compare and determine which types of features have the most occurrences. The columns $equipment$, $manufacturer$, $model$, $engine\_type$, $engines\_amount$, $registration\_aviation$, $operation\_phase$, $type\_operation$. 
 
 ```{r equip, fig.cap="The shares of accidents coming from the same type of aircraft", echo=FALSE}
 
@@ -616,7 +617,7 @@ include_graphics("8.png")
 
 ```
 
-Figure \@ref(fig:equip) to Figure \@ref(fig:typop) are the pie charts of the shares of different features of the aircrafts. First, certain features have a dominating one, such as the one for the type of aircraft from Figure \@ref(fig:equip) (Airplane), the one for the type of engine from Figure \@ref(fig:engtyp) (Piston), and the one for the amount of engine from Figure \@ref(fig:engamo) (1). Then there are also certain features that are more shared by different categories, but the main one is still apparent, such as the one for the aviation registration from Figure \@ref(fig:regav) (Private) and the one for the type of operation from Figure \@ref(fig:optyp) (Private). Last, some are shared by several categories, such as the one for the operation phase from Figure \@ref(fig:opphase) having Landing and Takeoff as the type phases in which the accidents occurred the most. The one for the manufacturer and the model (Figure \@ref(fig:manu) and Figure \@ref(fig:model)) are shared by multiple types of them, but we can observe that the share of the manufacturers are spread more or less equally for only certain of them, whereas the one of the model is shared more or less equally for almost all of them. We have a more dense share for the model: if we except the ones that have less than 20 counts, the amount would sum up to almost 60\%.
+Figure \@ref(fig:equip) to Figure \@ref(fig:typop) are the pie charts of the shares of different features of the aircrafts. First, certain features have a dominating one, such as the one for the type of aircraft from Figure \@ref(fig:equip) (Airplane), the one for the type of engine from Figure \@ref(fig:engtyp) (Piston), and the one for the amount of engine from Figure \@ref(fig:engamo) (1). Then there are also certain features that are more shared by different categories, but the main one is still apparent, such as the one for the aviation registration from Figure \@ref(fig:regav) (Private) and the one for the type of operation from Figure \@ref(fig:typop) (Private). Last, some are shared by several categories, such as the one for the operation phase from Figure \@ref(fig:opphase) having Landing and Takeoff as the type phases in which the accidents occurred the most. The one for the manufacturer and the model (Figure \@ref(fig:manu) and Figure \@ref(fig:model)) are shared by multiple types of them, but we can observe that the share of the manufacturers are spread more or less equally for only certain of them, whereas the one of the model is shared more or less equally for almost all of them. We have a more dense share for the model: if we except the ones that have less than 20 counts, the amount would sum up to almost 60\%.
 
 Although there are certain types of aircraft features that encountered the most accidents, we cannot say much if they are more likely to encounter accidents than others, since we don't know the percentage among all the flights. It is highly possible that the main ones are also the most used ones, and the percentage of occurrences might not be bigger than the other ones. Therefore it is hard to conclude that the choice of certain features can be more dangerous to the passengers or not. We can still say that the most dangerous operation phase is when the aircraft is landing or taking off, since all the aircrafts go through all the phases during the operation. 
 
@@ -636,16 +637,16 @@ To check, let A and B the columns. Then the count of categories of A is counted 
 
 
 ```{r , results='asis', echo=FALSE}
-A=c("equipment", "manufacturer","takeoff_max_weight (Lbs)", "seatings_amount", "engines_amount", "engine_type","registration_aviation")
+A=c("equipment", "manufacturer","takeoff max weight (Lbs)", "seatings amount", "engines amount", "engine type","registration aviation")
 B=c("model","model","model","model","model","model","model")
 Number_of_outliers=c(7,92,173,211,5,8,392)
-corr=data.frame(A,B,Number_of_outliers)
+corr=t(data.frame(A,B,Number_of_outliers))
 
 stargazer(corr, type = "html", title = "Table 4: the pair of columns chosen and its number of outliers")
 
 ```
 
-Table 4 shows the number of outliers computed from each pairs of columns. We can observe that on one hand, there are several columns that are indeed highly correlated to the model, such as the type of aircraft, the amount of engines and the type of engines. On the other hand, there are columns that do not often match with the one of the model: the $registration_aviation$ has the most outliers among all. We can conclude that although some columns can be omitted, the others are still important to consider. For instance, for $registration_aviation$, almost 20\% of the cases are outliers, for $takeoff_max_weight (Lbs)$ and $seatings_amount$ about 10\% are outliers, and for $manufacturer$ about 5\% are outliers. We can see that quite often the aircrafts users changed some features from the original aircraft model. 
+Table 4 shows the number of outliers computed from each pairs of columns. We can observe that on one hand, there are several columns that are indeed highly correlated to the model, such as the type of aircraft, the amount of engines and the type of engines. On the other hand, there are columns that do not often match with the one of the model: the $registration\_aviation$ has the most outliers among all. We can conclude that although some columns can be omitted, the others are still important to consider. For instance, for $registration\_aviation$, almost 20\% of the cases are outliers, for $takeoff\_max\_weight (Lbs)$ and $seatings\_amount$ about 10\% are outliers, and for $manufacturer$ about 5\% are outliers. We can see that quite often the aircrafts users changed some features from the original aircraft model. 
 
 The maximum weight for the takeoff and the number of available seats of the aircrafts have also been used for the analysis. The scatter plots are made for the analysis, since we are working with categorical variables that are ordered.
 
@@ -665,7 +666,7 @@ include_graphics("10.png")
 
 Figure \@ref(fig:seat) is a scatter plot of the count of the accidents of each number of available seatings. Again, we can observe that most of the accidents are from the aircrafts having the least number of available seatings. 
 
-As a result, we cannot conclude on the possibility of occurrences on the features of the aircraft, but the observation made shows that most of the occurrences come from private (from Figure \@ref(fig:regav) and \@ref(fig:optyp)), small (from Figure \@ref(fig:max) and Figure \@ref(fig:seat)) aircrafts.
+As a result, we cannot conclude on the possibility of occurrences on the features of the aircraft, but the observation made shows that most of the occurrences come from private (from Figure \@ref(fig:regav) and \@ref(fig:typop)), small (from Figure \@ref(fig:max) and Figure \@ref(fig:seat)) aircrafts.
 
 ##### include analysis about the fatalities? or give this part to someone else
 
@@ -703,9 +704,11 @@ As shown, most of variables has linearity, except that `registration_category_PR
 
 
 #### 2. No Multicollinearity
-```{r, echo = FALSE}
+```{r, echo = FALSE, results='asis', warning=FALSE, message = FALSE}
 load("assumption.RData")
-myvif
+library(stargazer)
+test<- t(myvif %>% data.frame() %>% mutate(across(where(is.numeric), ~ round(., 2))))
+stargazer(test, type = "html",flip=TRUE, title = "VIF Value for Each Variable")
 ```
 
 To satisfy collinearity assumption, we make sure all VIF value are less than 10. We manually removed the variables with VIFs greater than 10 [@yc2].
