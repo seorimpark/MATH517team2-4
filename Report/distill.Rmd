@@ -36,8 +36,7 @@ Modern society has been become increasingly dependent on the use of airplanes du
 
 ### Research questions
 
-The main goal of this project is to answer the following question: 
-What are the main risk factors that led to a plane crash in Brazil in a 10-year period. Similarities between the accidents will be sought. Here are some more specific questions arising from the main problem that we will try to answer: 
+The main goal of this project is to answer the following question: what are the main risk factors that led to a plane crash in Brazil from 2006 to 2015? Similarities between the accidents will be sought. Here are some more specific questions arising from the main problem that we will try to answer: 
 
 - How are the accidents distributed on a map? Are there areas where accidents are more concentrated? 
 
@@ -53,42 +52,42 @@ What are the main risk factors that led to a plane crash in Brazil in a 10-year 
 
 ### Approaches
 
-To answer our question, we first represented the accidents by state in Brazil to visualize their distribution. To go further, we used $\textsf{R}$ packets for geocoding (data with only place names, but no geographic coordinates) to represent each accident on a map.  
+To answer our question, we first represented the accidents by state in Brazil to visualize their distribution. To go further, we used $\textsf{R}$ packages for geocoding (data with only place names, but no geographic coordinates) to represent each accident on a map.  
 We then turned to the temporal analysis. For this, we first made a visual approach and then an analytical one through a linear, logistic and quantile regression in order to study the association between the life of the aircraft, the severity of the accident and the level of damage.
 In addition, we made pie charts to see the shares between each category of each characteristic. We also checked whether some columns were highly correlated with each other.
 Finally, we wanted to find a good prediction of crash severity. To do this, the categorical data were transformed into numerical data by obtaining dummy variables and we performed a decision tree and logistic regression.
 
 ## Sources of information / datasets
 
-The dataset used in this report is from  [Kaggle](https://www.kaggle.com/paulovasconcellos/aeronautics-accidents-in-brazil) provided by the CENIPA (Centro de Investigação e Prevenção de Acidentes aeronáuticos, [Brazilian Open Data](https://dados.gov.br/dataset/ocorrencias-aeronauticas-da-aviacao-civil-brasileira)). The given dataset contains two files (`aircrafts.csv` and `occurrences.csv`), but merging them based on the unique occurrence ID ($occurrence\_id$) for each aircrafts was possible, so the latter one (`aircrafts_occurrences_merged.csv`) was used to analyse the different occurrences from the aircrafts. 
+The dataset used in this report is from  [Kaggle](https://www.kaggle.com/paulovasconcellos/aeronautics-accidents-in-brazil) provided by the CENIPA (Centro de Investigação e Prevenção de Acidentes aeronáuticos, [Brazilian Open Data](https://dados.gov.br/dataset/ocorrencias-aeronauticas-da-aviacao-civil-brasileira)). The given dataset contains two files (`aircrafts.csv` and `occurrences.csv`), but merging them based on the unique occurrence ID ($occurrence\_id$) for each aircraft was possible, so the latter one (`aircrafts_occurrences_merged.csv`) was used to analyse the different occurrences from the aircrafts. 
 
 The file contains different information about the aircraft and the accident. First of all, the dataset contains several columns about the features of the aircrafts which encountered accidents:
 
 * $aircraft\_id$ - Aircraft's identification number
 * $registration$ - Aircraft's registration number
 * $operator\_id$ - Operator's identification number
-* $equipment$ - Type of the aircraft (Airplane, Helicopter, Glider, Ultralight, Amphibious, Airship). Some of them are unknown.
-* $manufacturer$ - Name of the manufacturer of the aircraft
-* $model$ - Name of the model of the aircraft
-* $engine\_type$ - Type of the engine
-* $engines\_amount$ - Amount of the engine (it goes from 0 to 4)
-* $takeoff\_max\_weight (Lbs)$ - Maximum weight that the aircraft can hold for the takeoff
-* $seatings\_amount$ - Number of available seats of the aircraft
-* $year\_manufacture$ - Year when the aircraft was built
-* $registration\_country$ - Country in which the aircraft was registered (mostly Brazil, but also some other neighboring countries)
+* $equipment$ - Type of aircraft (airplane, helicopter, glider, ultralight, amphibious, airship). Some of them are unknown.
+* $manufacturer$ - Aircraft's manufacturer
+* $model$ - Aircraft's model
+* $engine\_type$ - Type of engine
+* $engines\_amount$ - Amount of engines (it goes from 0 to 4)
+* $takeoff\_max\_weight$ (Lbs) - Maximum takeoff weight (MTOW)
+* $seatings\_amount$ - Quantity of seatings available
+* $year\_manufacture$ - Aircraft's year of fabrication
+* $registration\_country$ - Country where the aircraft was registered (mostly Brazil, but also some other neighbouring countries)
 * $registration\_category$ - Aircraft's registration category at the moment of the occurrence
 * $registration\_aviation$ - Aircraft's aviation category at the moment of the occurrence
-* $origin\_flight$ - Location of the departure of the flight.
-* $destination\_flight$ - Planned destination of the flight.
+* $origin\_flight$ - Location of the departure of the flight
+* $destination\_flight$ - Planned destination of the flight
 * $operation\_phase$ - Operation phase at the moment of the occurrence
 * $type\_operation$ - Type of operation at the moment of the occurrence
-* $damage\_level$ - Level of damage of the aircraft, there are four levels (None, Light, Substantial, Destroyed). Some of them are unknown.
-* $fatalities\_amount$ - Number of fatalities from the accident. 
-* $extraction\_day$ - Date when the data was collected.
+* $damage\_level$ - Level of damage of the aircraft, there are four levels (none, light, substantial and destroyed). Some of them are unknown.
+* $fatalities\_amount$ - Number of fatalities (deaths) occurred
+* $extraction\_day$ - Date when the data was collected
 
 Then, the dataset also contains columns about the occurrences: 
 
-* $classification$ - Degree of seriousness of the accident (serious incident or accident)
+* $classification$ - Accident classification (serious incident or accident)
 * $type\;of\;occurrence$ - Type of accident 
 * $localization$ - City where the occurrence happened
 * $fu$ - State where the occurrence happened
@@ -96,16 +95,16 @@ Then, the dataset also contains columns about the occurrences:
 * $aerodrome$ - Aerodrome's ICAO code
 * $occurrence\_day$ - Occurrence date
 * $time$ - Time of the occurrence (UTC)
-* $under\_investigation$ - If the accident is or went under investigation (Yes, no or unknown)
+* $under\_investigation$ - If the accident is or went under investigation (yes, no or unknown)
 * $investigating\_command$ - Investigation command responsible for the occurrence investigation
 * $investigation\_status$ - Status of the investigation
 * $report\_number$ - Final report's identification number
-* $published\_report$ - If the report was published (If yes, 1)
+* $published\_report$ - If the report was published (if yes, 1)
 * $publication\_day$ - Publication day of the report
 * $recommendation\_amount$ - Security recommendation quantity emitted
 * $aircrafts\_involved$ - Quantity of aircrafts involved in the occurrence
-* $takeoff$ - If the aircraft took of (If yes, 1)
-* $extraction\_day$ - The date when the data was collected.
+* $takeoff$ - If the aircraft took of (if yes, 1)
+* $extraction\_day$ - Date when the data was collected
 
 
 ````{r packages, include=FALSE}
@@ -158,13 +157,13 @@ data_wo_na=drop_na(data)
 stargazer(na_count, flip=TRUE, type = "html", title = "Table 1: Repartition of NAs in the columns")
 ```
 
-The dataset is full of missing values to the point where there is no complete row. Table 1 displays the number of missing values in each column. $Takeoff$ is the top column containing NAs, with more than 87.4% of the data missing. We see also a significant number of missing data points in the columns related to the report such as $report\_number$ with more than 78.6%, $published\_report$,$publication\_day$ and $publication\_Week$ with 51%. We can see that the data is most present for columns containing information that are independent of the accident such as $aircraft\_id$, $manufacturer$ and $type\_operation$.
+The dataset contains variables with numerous missing values. Normally, we will not need them. Table 1 displays the number of missing values in each column. $Takeoff$ is the top column containing NAs, with more than 87.4% of the data missing. We see also a significant number of missing data points in the columns related to the report such as $report\_number$ with more than 78.6%, $published\_report$, $publication\_day$ and $publication\_Week$ with 51%. We can see that the data is most present for columns containing information that are independent of the accident such as $aircraft\_id$, $manufacturer$ and $type\_operation$.
 
 ```{r, include=FALSE}
 table(data["equipment"])/(2043-1)
 ```
 
-When looking at the type of equipment, 78% of our data concerns airplanes. It is followed by helicopter that constitue a little less that 13% of the data. Then comes ultralight, a bit more than 7% of the dataset. The rest are airship, amphibious our unknown.
+When looking at the type of equipment, 78% of our data concerns airplanes. It is followed by helicopters that constitute a little less that 13% of the data. Then comes ultralights, a bit more than 7% of the dataset. The rest are airships, amphibious or unknown.
 
 ```{r, include=FALSE}
 unique(data["manufacturer"])
@@ -172,15 +171,17 @@ unique(data["manufacturer"])
 ```{r, include=FALSE}
 table(data["manufacturer"])
 ```
-There are 120 unique manufacturers represented in our dataset. The top three manufacturers are the following: $NEIVA$ $INDUSTRIA$ $AERONAUTICA$, $EMBRAER$ and $AERO$ $BOERO$ with respectively 388, 155 and 126 planes. 
+
+There are 120 unique manufacturers represented in our dataset. The top three manufacturers are the following: Indústria Aeronáutica Neiva, Embraer and Aero Boero with respectively 388, 155 and 126 planes. 
 
 ```{r, include=FALSE}
 table(data$engine_type)/2043
 ```
-78% of the planes present in the dataset use a $PISTON$ engine. 7% use $TURBOSHAF$ engine, 6.8% use $TURBOPROP$ and the rest $JET$, $WITHOUT$ $TRACTION$ or unknown engines.
+
+78% of the aircrafts present in the dataset are motorized with a piston engine, 7% with a turboshaft engine, 6.8% with turboprop and the rest with jet, without traction or unknown engines.
 
 ```{r NbrEng, fig.cap="Distribution of the number of engines",echo=FALSE}
-hist(data$engines_amount,main="Distribution of the number of engines.", xlab="Number of engines")
+hist(data$engines_amount,main="Distribution of the number of engines", xlab="Number of engines")
 
 ```
 
@@ -188,7 +189,7 @@ hist(data$engines_amount,main="Distribution of the number of engines.", xlab="Nu
 table(data$engines_amount)/(2043-9)
 ```
 
-Considering Figure \@ref(fig:NbrEng), 73.25% of planes use a single engine. 24% of planes use two engines. The rest of planes have either 3 or 4 engines. We believe that 0 refers to unknown data although there was no mention of it in the data description.
+Considering Figure \@ref(fig:NbrEng), 73.25% of the aircrafts have a single engine. 24% are twin-engine. The rest are equipped with either 3 or 4 engines. We believe that 0 refers to unknown data although there was no mentions of it in the data description. It could also be the value taken for a glider. 
 
 ```{r distWeight,fig.cap="Distribution of take off max weight (in Lbs)", echo=FALSE}
 data_weight_no_zero=data
@@ -198,31 +199,34 @@ hist(data_weight_no_zero$takeoff_max_weight..Lbs., main="Distribution of take of
 ```{r,include=FALSE}
 max(data_weight_no_zero$takeoff_max_weight..Lbs.)
 ```
-Figure \@ref(fig:distWeight) is displayed the distribution of take off max weight (in Lbs). It can be seen that that the mean weight is of 11,919.2 Lbs (5,406.4 Kg). There are though very strong outliers with planes having set their maximun weight at 630,499 Lbs (285,989.5 Kg). 
+
+Figure \@ref(fig:distWeight) shows the distribution of takeoff max weight (in Lbs). It can be seen that that the mean weight is of 11'919.2 Lbs (5406.4 Kg). There are though very strong outliers with aircrafts having set their maximum weight at 630'499 Lbs (285'989.5 Kg). 
 
 ```{r distManYear,fig.cap="Distribution of manufacturing year",echo=FALSE}
 data_year_no_zero=data
 data_year_no_zero=data_year_no_zero[data_year_no_zero$year_manufacture != 0,]
 hist(data_year_no_zero$year_manufacture,breaks=100, main="Distribution of manufacturing year", xlab="Year")
 ```
-In Figure \@ref(fig:distManYear) is displayed the distribution of manufacturing year. One can observe that the planes represented in the dataset were manufactered between 1936 and 2015. The year distribution is trimodal with high peaks in late 70s, early 90s and mid 00s. 
+
+In Figure \@ref(fig:distManYear) is displayed the distribution of manufacturing year. One can observe that the aicrafts represented in the dataset were manufactured between 1936 and 2015. The year distribution is trimodal with high peaks in late 70s, early 90s and mid 00s. 
 
 ```{r, include= FALSE}
 table(data$registration_country)
 ```
 
-Concerning the registration country, 2000 out of the 2043 constituting the data are registered in Brazil. 22 are registered in the United States of America and finally there is one accident registered in Germany, France, Poland, Russia, Saudia Arabia, South Africa, Spain and Uruguay. 
+Concerning the registration country, 2000 out of the 2043 constituting the data are registered in Brazil. 22 are registered in the United States of America and finally there is one accident registered in Germany, France, Poland, Russia, Saudi Arabia, South Africa, Spain and Uruguay. 
 
 ```{r, include= FALSE}
 table(data$registration_aviation)/(2043)
 ```
-37% of the accident concern $private$ registrations. 18% come from $instruction$ registration. The rest are either $aerotaxi$ (13%),$experimental$ (9.8%), $agricultural$ (9%), $regular$ (4%), $specialized$ (3%) or other registrations. 
 
+37% of the accidents concern $private$ registrations. 18% come from $instruction$ registration. The rest are either $aerotaxi$ (13%), $experimental$ (9.8%), $agricultural$ (9%), $regular$ (4%), $specialized$ (3%) or other registrations. 
 
 ```{r, include= FALSE}
 sort(table(data$operation_phase)/2043)
 ```
-19% of the accidents registered happened when landing. 17% when taking off. 11% when cruising and 9% during the run after the landing. Accidents also happen during the following phases: during maneuver (4.9%), during ascension(4.8%), final approximation (3.4%), descend (3.3%), low altitude navigation (2.8%), traffic circuit (2.5%), taxi (2%), rush on the ground (1.4%) and other less represented phases.
+
+19% of the accidents registered happened during landing, 17% during takeoff, 11% during cruise and 9% during the run after landing. Accidents also happen during the following phases: during maneuver (4.9%), ascension (4.8%), final approximation (3.4%), descend (3.3%), low altitude navigation (2.8%), traffic circuit (2.5%), taxi (2%), rush on the ground (1.4%) and other less represented phases.
 
 ```{r, include= FALSE}
 sort(table(data$damage_level)/2043)
@@ -230,18 +234,20 @@ sort(table(data$damage_level)/2043)
 ```{r, include= FALSE}
 table(data$classification)/2043
 ```
-Concerning the damage, 72.6% of crashes were classified as $accident$ and the rest was classified as $serious incident$. 58% of the planes knew substantial damage after the crash. 17% are completely destroyed, 12.7% know light damage where 8% have no damage. The rest is unknown. 
 
+Concerning the damage, 72.6% of crashes were classified as $accident$ and the rest was classified as $serious$ $incident$. 58% of the aircrafts knew substantial damage after the crash. 17% are completely destroyed, 12.7% know light damage where 8% have no damage. The rest is unknown. 
 
 ```{r distFat,fig.cap="Distribution of fatalities",echo=FALSE}
 hist(data$fatalities_amount, breaks=50, main= "Distribution of fatalities", xlab="fatalities")
 ```
-In Figure \@ref(fig:distFat) is displayed the number the fatalities. It can be seen that most of the crashes involve less than 20 deaths. The deadliest crash was in a private helicopter in 1999 in Sau Paolo where 199 lost their life during the landing. 
+
+In Figure \@ref(fig:distFat) is displayed the number of fatalities. It can be seen that most of the crashes involve less than 20 deaths. The deadliest crash was in a private helicopter in 1999 in São Paulo where 199 lost their life during landing. 
 
 ```{r, include=FALSE}
 table(data$investigation_status)/2043
 ```
-Finally, the investigation of 52% of the crashes is finished. 37% are in progress and less than 0.05% of the crashes have had their investigation reopened. 
+
+Finally, the investigation of 52% of the crashes is finished. 37% are in progress while less than 0.05% of the crashes have had their investigation reopened. 
 
 ## Geographical visualization of accidents 
 
@@ -376,7 +382,7 @@ fu
 
 ```
 
-All the states have less than 200 accidents, more precisely less than 170 (Rio Grande do Sul), except one state: São Paulo. This state is not larger than the others (it is rather medium in size), which indicates that there is clearly a concentration of accidents in this area. Note that ten accidents are not shown on the map (Table 2). Eight of them occurred outside of Brazil and two more for other reasons: one ended up in international waters and the other does not have its location identified. 
+All the states have less than 200 accidents, more precisely less than 170 (Rio Grande do Sul), except one: São Paulo. This state is not larger than the others (it is rather medium in size), which indicates that there is clearly a concentration of accidents in this area. Note that ten accidents are not shown on the map (Table 2). Eight of them occurred outside of Brazil and two more for other reasons: one ended up in international waters and the other does not have its location identified. 
 
 ```{r , results='asis', echo=FALSE}
 
@@ -426,25 +432,28 @@ data$publicationWeek <-wday(data$publicationWeek, label=TRUE)
 data$occuranceWeek <- as.Date(data$occurrence_day)
 ```
 
-```{r hourAccid, fig.cap="Distribution of Accidents throughout the hours of the day", echo=FALSE}
-hist(strptime(data$time, format="%H:%M:%S"),main="Distribution of Accidents throughout the hours of the day",xlab="Hours of the day",breaks="hours")
+```{r hourAccid, fig.cap="Distribution of accidents throughout the hours of the day", echo=FALSE}
+hist(strptime(data$time, format="%H:%M:%S"),main="Distribution of accidents throughout the hours of the day",xlab="Hours of the day",breaks="hours")
 ```
-In Figure \@ref(fig:hourAccid) are displayed the distribution of accidents throughout the hours of the day. The distribution is bimodal and it can be observed that most of the crashes happen either 2pm or 8pm.
 
-```{r timeAccid, fig.cap="Distribution of Accidents throughout days",  echo=FALSE}
-hist(data$occurrence_day,main="Distribution of Accidents throughout days",xlab="Days",breaks='months')
+In Figure \@ref(fig:hourAccid) are displayed the distribution of accidents throughout the hours of the day. The distribution is bimodal and it can be observed that most of the crashes happen either at 2pm or at 8pm.
+
+```{r timeAccid, fig.cap="Distribution of accidents throughout days",  echo=FALSE}
+hist(data$occurrence_day,main="Distribution of accidents throughout days",xlab="Days",breaks='months')
 ```
-In Figure \@ref(fig:timeAccid) are displayed the distribution of accidents throughout days. we can see that there is an increasing trend. 
+
+In Figure \@ref(fig:timeAccid) are displayed the distribution of accidents throughout days. We observe that there is an increasing trend. 
 
 ```{r, include=FALSE}
 Time_Occurence_publication=data$publication_day-data$occurrence_day
 Time_Occurence_publication=as.numeric(Time_Occurence_publication, units="days")
 ```
 
-```{r Occurancepublication, fig.cap="of time difference between the occurance and the publication date",echo=FALSE}
-hist(Time_Occurence_publication,main="Distribution of time difference: occurance and publication",xlab="Number of days")
+```{r Occurancepublication, fig.cap="Distribution of time difference between the occurrence and the publication date",echo=FALSE}
+hist(Time_Occurence_publication,main="Distribution of time difference: occurrence and publication",xlab="Number of days")
 ```
-In Figure \@ref(fig:Occurancepublication) are displayed the distribution of time difference in days between the occurance day and publication day. It can be seen that most of crashes are reported the same year. The longest time difference is of 3589 days. It was for a political operation caused by a loss of control in the air in year 1986 in Brazil. 
+
+In Figure \@ref(fig:Occurancepublication) is displayed the distribution of time difference in days between the occurrence day and publication day. It can be seen that most of crashes are reported the same year. The longest time difference is of 3589 days. It was for a political operation caused by a loss of control in the air in year 1986 in Brazil. 
 
 ### Lifetime of aircraft
 
@@ -495,7 +504,7 @@ df.damage.age<-df.damage.age[!is.na(df.damage.age$equipment),]
 plot( ecdf(df.age$lifetime), main='', ylab =TeX('$P(X \\leq x)$') )
 ```
 
-We observe that more than 80% of the aircraft are between 0 and 40 years old at the time of the incident, with a small number of aircraft reaching nearly 80 years.
+We observe that more than 80% of the aircrafts are between 0 and 40 years old at the time of the incident, with a small number of aircrafts reaching nearly 80 years.
 
 Next, we provide a scatter plot to visually inspect the association between age and damage level in (\@ref(fig:damagelifetime))
 
@@ -503,7 +512,7 @@ Next, we provide a scatter plot to visually inspect the association between age 
 plot(df.damage.age$lifetime, df.damage.age$damage_level, 'p', xlab='Aircraft lifetime',ylab='Damage level')
 ```
 
-and likewise between aircraft lifetime damage level (outcome)  in (\@ref(fig:damageseverity))
+and likewise between aircraft lifetime and accident severity (outcome)  in (\@ref(fig:damageseverity)).
 
 ```{r damageseverity, fig.cap="Scatter plot of severity versus aircraft lifetime in recorded incidents", echo=FALSE}
 plot(df.damage.age$lifetime, df.damage.age$classification, 'p', xlab='Aircraft lifetime', ylab='accident severity')
@@ -537,7 +546,7 @@ exp(cbind(OR = coef(fit.logistic), confint(fit.logistic)))
 
 Once again, the confidence interval includes the null value. Finally, we consider the quantile regression coefficient from the quantile regression model
 $$ Q_Y(\tau\mid X) = a_0(\tau) + b_0(\tau)X $$
-where the outcome $Y$ is airplane lifetime and we take accident severity as an exposure $X$. The resulting regression coefficient is plotted in Figure (\@ref(fig:quantilelifetime))
+where the outcome $Y$ is airplane lifetime and we take accident severity as an exposure $X$. The resulting regression coefficient is plotted in Figure \@ref(fig:quantilelifetime).
 
 ```{r quantilelifetime, fig.cap="Quantile regression of damage level on the quantile of aircraft lifetime", echo=FALSE}
 # Quantile regression for severity
@@ -545,9 +554,9 @@ fm2 <- rq(lifetime ~ classification, data = df.damage.age, tau =  0.1+ 1:8/10)
 plot(fm2, parm = 2, mar = c(5.1, 4.1, 2.1, 2.1), xlab=TeX('$\\tau$'),main='Y = Lifetime, X = Damage level', ylab = TeX('$b_0(\\tau$)'), cex = 1, pch = 19)
 ```
 
-The quantile plot shows that the conditional cumulative distribution function, conditioning on severity level 'serious incident', is narrower compared to the conditional cumulative distribution function, conditioning on severity level 'accident'. In other words, both high and low quantiles are shifted towards the median.
+The quantile plot shows that the conditional cumulative distribution function, conditioning on severity level "serious incident", is narrower compared to the conditional cumulative distribution function, conditioning on severity level "accident". In other words, both high and low quantiles are shifted towards the median.
 
-As we did not find any strong associations between damage level and age of the aircraft marginally in the population. This motivated us to examine further whether such associations could exist within subsets of the population, such as the strata of incidents involving helicopters. Once again, we perform a logistic regression, which yields the following fit diagnostic and confidence intervals:
+As we did not find any strong associations between damage level and age of the aircraft marginally in the population, it motivated us to examine further whether such associations could exist within subsets of the population, such as the strata of incidents involving helicopters. Once again, we perform a logistic regression, which yields the following fit diagnostic and confidence intervals:
 
 ```{r echo=FALSE}
 df.helicopters<-df.damage.age[df.equipment='HELICOPTER',]
@@ -561,11 +570,7 @@ We do not find a strong association between accident severity and aircraft age w
 
 ## Features of the aircrafts
 
-### Occurence type
-
-### Other features
-
-Different features of aircrafts are presented in the dataset, and some types of them might have caused the most accidents among all. An interactive plot ([link](https://aircraftaccteam2.herokuapp.com)) involving pie charts of the number of counts of different features is made to compare and determine which types of features have the most occurrences. The columns $equipment$, $manufacturer$, $model$, $engine\_type$, $engines\_amount$, $registration\_aviation$, $operation\_phase$, $type\_operation$. 
+Different features of aircrafts are presented in the dataset, and some types of them might have caused the most accidents among all. An interactive plot ([link](https://aircraftaccteam2.herokuapp.com)) involving pie charts of the number of counts of different features is made to compare and determine which types of features have the most occurrences. Here are the output for variables $equipment$, $manufacturer$, $model$, $engine\_type$, $engines\_amount$, $registration\_aviation$, $operation\_phase$, $type\_operation$. 
 
 ```{r equip, fig.cap="The shares of accidents coming from the same type of aircraft", echo=FALSE}
 
@@ -615,11 +620,11 @@ include_graphics("8.png")
 
 ```
 
-Figure \@ref(fig:equip) to Figure \@ref(fig:typop) are the pie charts of the shares of different features of the aircrafts. First, certain features have a dominating one, such as the one for the type of aircraft from Figure \@ref(fig:equip) (Airplane), the one for the type of engine from Figure \@ref(fig:engtyp) (Piston), and the one for the amount of engine from Figure \@ref(fig:engamo) (1). Then there are also certain features that are more shared by different categories, but the main one is still apparent, such as the one for the aviation registration from Figure \@ref(fig:regav) (Private) and the one for the type of operation from Figure \@ref(fig:typop) (Private). Last, some are shared by several categories, such as the one for the operation phase from Figure \@ref(fig:opphase) having Landing and Takeoff as the type phases in which the accidents occurred the most. The one for the manufacturer and the model (Figure \@ref(fig:manu) and Figure \@ref(fig:model)) are shared by multiple types of them, but we can observe that the share of the manufacturers are spread more or less equally for only certain of them, whereas the one of the model is shared more or less equally for almost all of them. We have a more dense share for the model: if we except the ones that have less than 20 counts, the amount would sum up to almost 60\%.
+Figure \@ref(fig:equip) to Figure \@ref(fig:typop) are the pie charts of the shares of different features of the aircrafts. First, certain features have a dominating one, such as the one for the type of aircraft from Figure \@ref(fig:equip) (airplane), the one for the type of engine from Figure \@ref(fig:engtyp) (piston), and the one for the amount of engine from Figure \@ref(fig:engamo) (1). Then there are also certain features that are more shared by different categories, but the main one is still apparent, such as the one for the aviation registration from Figure \@ref(fig:regav) (Private) and the one for the type of operation from Figure \@ref(fig:typop) (private). Last, some are shared by several categories, such as the one for the operation phase from Figure \@ref(fig:opphase) having landing and takeoff as the type phases in which the accidents occurred the most. The one for the manufacturer and the model (Figure \@ref(fig:manu) and Figure \@ref(fig:model)) are shared by multiple types of them, but we can observe that the share of the manufacturers are spread more or less equally for only certain of them, whereas the one of the model is shared more or less equally for almost all of them. We have a more dense share for the model: if we except the ones that have less than 20 counts, the amount would sum up to almost 60\%.
 
-Although there are certain types of aircraft features that encountered the most accidents, we cannot say much if they are more likely to encounter accidents than others, since we don't know the percentage among all the flights. It is highly possible that the main ones are also the most used ones, and the percentage of occurrences might not be bigger than the other ones. Therefore it is hard to conclude that the choice of certain features can be more dangerous to the passengers or not. We can still say that the most dangerous operation phase is when the aircraft is landing or taking off, since all the aircrafts go through all the phases during the operation. 
+Although there are certain types of aircraft features that encountered the most accidents, we cannot say much if they are more likely to encounter accidents than others, since we do not know the percentage among all the flights. It is highly possible that the main ones are also the most used ones, and the percentage of occurrences might not be bigger than the other ones. Therefore it is hard to conclude that the choice of certain features can be more dangerous to the passengers or not. We can still say that the most dangerous operation phase is when the aircraft is landing or taking off, since all the aircrafts go through all the phases during the operation. 
 
-The correlation between the different features is interesting to observe, since we can omit certain columns to analyse the type of the features of aircrafts that encountered the most accidents. However there are some subtleties in analyzing the correlation because the variables are categorical. As most of the variables are not ordered, several columns suspected to be correlated are chosen. 
+The correlation between the different features is interesting to observe, since we can omit certain columns to analyse the type of the features of aircrafts that encountered the most accidents. However there are some subtle ties in analysing the correlation because the variables are categorical. As most of the variables are not ordered, several columns suspected to be correlated are chosen. 
 
 The aim is to see if between the two chosen columns, one is a further classification of the other one. For instance, we want to check if aircrafts of the same model are from the same manufacturer. In other words, we want to check if the column $model$ is a further classification of the column $manufacturer$. Mainly, we want to check if the aircraft models have a certain type of fixed features, because if they are, those features can be omitted and the information about the model is enough for the analysis.
 
@@ -631,7 +636,7 @@ To check, let A and B the columns. Then the count of categories of A is counted 
 * Do the aircrafts from the same model have the same number of available seatings?
 * Do the aircrafts from the same model have the same number of engines?
 * Do the aircrafts from the same model have the same type of engines?
-* Do the aircrafts from the same model registered as to have the same purpose?
+* Do the aircrafts from the same model registered for the same purpose?
 
 
 ```{r , results='asis', echo=FALSE}
@@ -644,7 +649,7 @@ stargazer(corr, type = "html", title = "Table 4: the pair of columns chosen and 
 
 ```
 
-Table 4 shows the number of outliers computed from each pairs of columns. We can observe that on one hand, there are several columns that are indeed highly correlated to the model, such as the type of aircraft, the amount of engines and the type of engines. On the other hand, there are columns that do not often match with the one of the model: the $registration\_aviation$ has the most outliers among all. We can conclude that although some columns can be omitted, the others are still important to consider. For instance, for $registration\_aviation$, almost 20\% of the cases are outliers, for $takeoff\_max\_weight (Lbs)$ and $seatings\_amount$ about 10\% are outliers, and for $manufacturer$ about 5\% are outliers. We can see that quite often the aircrafts users changed some features from the original aircraft model. 
+Table 4 shows the number of outliers computed from each pairs of columns. We can observe that on one hand, there are several columns that are indeed highly correlated to the model, such as the type of aircraft, the amount of engines and the type of engines. On the other hand, there are columns that do not often match with the one of the model: the $registration\_aviation$ has the most outliers among all. We can conclude that although some columns can be omitted, the others are still important to consider. For instance, for $registration\_aviation$, almost 20\% of the cases are outliers, for $takeoff\_max\_weight$ (Lbs) and $seatings\_amount$ about 10\% are outliers, and for $manufacturer$ about 5\% are outliers. We can see that quite often the aircrafts users changed some features from the original aircraft model. 
 
 The maximum weight for the takeoff and the number of available seats of the aircrafts have also been used for the analysis. The scatter plots are made for the analysis, since we are working with categorical variables that are ordered.
 
@@ -654,7 +659,7 @@ include_graphics("9.png")
 
 ```
 
-Figure \@ref(fig:max) is a scatter plot of the count of the accidents of each maximum weights. We can observe that the most of the accidents are from the aircrafts having lesser maximum weights. 
+Figure \@ref(fig:max) is a scatter plot of the count of the accidents of each maximum weights. We can observe that most of the accidents are from aircrafts having lower maximum weights. 
 
 ```{r seat, fig.cap="The shares of accidents coming from the same type of operation", echo=FALSE}
 
@@ -664,17 +669,16 @@ include_graphics("10.png")
 
 Figure \@ref(fig:seat) is a scatter plot of the count of the accidents of each number of available seatings. Again, we can observe that most of the accidents are from the aircrafts having the least number of available seatings. 
 
-As a result, we cannot conclude on the possibility of occurrences on the features of the aircraft, but the observation made shows that most of the occurrences come from private (from Figure \@ref(fig:regav) and \@ref(fig:typop)), small (from Figure \@ref(fig:max) and Figure \@ref(fig:seat)) aircrafts.
+As a result, we cannot conclude on the possibility of occurrences on the features of the aircraft, but the observation made shows that most of the occurrences come from private (Figure \@ref(fig:regav) and \@ref(fig:typop)) and small (Figure \@ref(fig:max) and Figure \@ref(fig:seat)) aircrafts.
 
-##### include analysis about the fatalities? or give this part to someone else
 
 ## Causes of severe accidents
 
 #### Transform Categorical Variables into Numerical Variables
-To predict the severe accidents vs minor incident and analyse the possible cause, we get dummy variables for each categorical variable, e.g. when one of the operation types is INSTRUCTION, we create a new column called  `type_operation_INSTRUCTION` and give it 1 if the type is INSTRUCTION, 0 otherwise. 
+To predict the severe accidents vs minor incidents and analyse the possible causes, we get dummy variables for each categorical variable, e.g. when one of the operation types is INSTRUCTION, we create a new column called  `type_operation_INSTRUCTION` and give it 1 if the type is INSTRUCTION, 0 otherwise. 
 
 ### Decision Tree
-After getting dummies variables, we feed the dataset to our decision tree predictive model and obtain the following result. 
+After getting dummy variables, we feed the dataset to our decision tree predictive model and obtain the following result. 
 
 <img src="decision_tree_depth2.svg" alt="drawing" width="80%"/>
 
@@ -690,7 +694,7 @@ By performing cross validation, we find the depth-2 tree achieves the best mean 
 knitr::include_url("incident_raw_logistic_result.html", height = "500px")
 ```
 
-Logistic regression shows that the increases in `engines amount`, `occurrence year`, `registration category EXT`, `registration category PIN`, `registration category PRI`, `registration category TPR`, `operation phase RUN AFTER LANDING` or `fu PA` will increase the log odds of getting severe incident, while increases in `engine type PISTON`, `operation phase FINAL APPROXIMATION`, `operation phase MANEUVER` or `operation phase Others` will decrease the log odds of getting severe incident[@yc1].
+Logistic regression shows that the increases in `engines amount`, `occurrence year`, `registration category EXT`, `registration category PIN`, `registration category PRI`, `registration category TPR`, `operation phase RUN AFTER LANDING` or `fu PA` will increase the log odds of getting severe incident, while increases in `engine type PISTON`, `operation phase FINAL APPROXIMATION`, `operation phase MANEUVER` or `operation phase Others` will decrease the log odds of getting severe incident [@yc1].
 
 ### Assumption Checking
 
@@ -706,10 +710,10 @@ As shown, most of variables has linearity, except that `registration_category_PR
 load("assumption.RData")
 library(stargazer)
 test<- t(myvif %>% data.frame() %>% mutate(across(where(is.numeric), ~ round(., 2))))
-stargazer(test, type = "html",flip=TRUE, title = "VIF Value for Each Variable")
+stargazer(test, type = "html",flip=TRUE, title = "Table 5: VIF value for each variable")
 ```
 
-To satisfy collinearity assumption, we make sure all VIF value are less than 10. We manually removed the variables with VIFs greater than 10 [@yc2].
+To satisfy collinearity assumption, we make sure all VIF value are less than 10 in Table 5. We manually removed the variables with VIFs greater than 10 [@yc2].
 
 
 #### 3. No Influential Observations
@@ -721,7 +725,7 @@ library(broom)
 plot(mylogit, which = 4, id.n = 3)
 ```
 
-In the Cook's distance plot, outliners in the dataset are presented and the 3 largest distance values are labelled which require us to further explore them.
+In the Cook's distance plot, outliers in the dataset are presented and the 3 largest distance values are labelled which require us to further explore them.
 
 
 ```{r, echo = FALSE}
@@ -730,7 +734,7 @@ model.data <- augment(mylogit) %>%
 model.data %>% top_n(3, .cooksd)
 ```
 
-The 3 most extreme observations are shown as above.
+The three most extreme observations are shown as above.
 
 
 ```{r, echo = FALSE}
@@ -746,22 +750,22 @@ We would like to perform DBSCAN or Kmeans clustering on our dataset. However, we
 
 <img src="pca.png" alt="drawing" width="80%"/>
 
-The result of pca shows that when we keep 7 dimensions, only around 40% of variance will be captured and the curse of dimensionality might still exist. Hence it is not sensible to continue the investigation by performing clustering. Also, the DBSCAN does not give a good result on it hence not included.
+The result of PCA shows that when we keep 7 dimensions, only around 40% of variance will be captured and the curse of dimensionality might still exist. Hence it is not sensible to continue the investigation by performing clustering. Also, the DBSCAN does not give a good result on it hence not included.
 
 
 ## Conclusion
 
-- By visualizing the accidents on a map, we found that there is a concentration of accidents in the state of São Paulo, or more generally in the whole Southeast Region of Brazil. The possible explanations are linked to demography or the high density of air traffic. As air activity is higher in these areas, the risk of an accident to occur increases. 
+By visualizing the accidents on a map, we found that there is a concentration of accidents in the state of São Paulo, or more generally in the whole Southeast Region of Brazil. The possible explanations are linked to demography or the high density of air traffic. As air activity is higher in these areas, the risk of an accident to occur increases. 
 
-- We employed linear, logistic and quantile regression to investigate the association between aircraft lifetime, accident severity and damage level, but did not find any statistically significant associations.
+Then, We employed linear, logistic and quantile regression to investigate the association between aircraft lifetime, accident severity and damage level, but did not find any statistically significant associations. We also did an analysis on the different features of the aircraft. Although it is hard to tell that certain type of features are more likely to encounter accidents, we could conclude that most of the accidents come from small aircrafts for private purposes. Moreover, certain features were mostly one of the characteristics of the model of the aircraft, so we can expect for them to be omitted.
 
-- We did an analysis on the different features of the aircraft. Although it is hard to tell that certain type of features are more likely to encounter accidents, we could conclude that most of the accidents come from small aircrafts for private purposes. Also, certain features were mostly one of the characteristics of the model of the aircraft, so we can expect for them to be omitted.
+Overall, for predicting accident severity, due to a small $R^2$ in logistic regression and a relatively satisfying 75% accuracy from decision tree, we prefer decision tree over logistic regression as our predictive model. By looking at the decision tree, we use `engines_amount` as the major factor and `type_operation_INSTRUCTION` and `takeoff_max_weight..Lbs.` as the secondary factors to predict the severity of accident.
 
-- Overall, for predicting accident severity, due to a small $R^2$ in logistic regression and a relatively satisfying 75% accuracy from decision tree, we prefer decision tree over logistic regression as our predictive model. By looking at the decision tree, we use `engines_amount` as the major factor and `type_operation_INSTRUCTION` and `takeoff_max_weight..Lbs.` as the secondary factors to predict the severity of accident.
+Finally, our analyses and research allowed us to answer our initial questions. We have looked at several potential factors that can increase the risk of accidents, and now have a better understanding of them, especially in Brazil. 
 
 ## Future improvements
 
-Currently, we have too many categorical variables in our dataset. Affected by the limit of our machine learning techniques, we mainly use numerical variables while building up predictive models, hence we have to transform those categorical variables into numerical ones by adding lots of dummy variables. However, after transformation, the dimension becomes extremely large. We would like to perform clustering but we have to reduce the dimension first. However, the result of PCA shows that we cannot use this technique to reduce the dimension sufficiently and still make sure it contains most of the information in the dataset. Hence we require a larger dataset with more observations. Currently we are using Brazilian Aeronautics Accidents in 10 years. So it is possible to enlarge our dataset by expanding our investigation to a longer period as well as study more countries.
+Currently, we have too many categorical variables in our dataset. Affected by the limit of our machine learning techniques, we mainly used numerical variables while building up predictive models, hence we have to transform those categorical variables into numerical ones by adding lots of dummy variables. However, after transformation, the dimension becomes extremely large. We would like to perform clustering but we have to reduce the dimension first. However, the result of PCA shows that we cannot use this technique to reduce the dimension sufficiently and still make sure it contains most of the information in the dataset. Hence we require a larger dataset with more observations. Currently we are using Brazilian Aeronautics Accidents in 10 years. So it is possible to enlarge our dataset by expanding our investigation to a longer period as well as study more countries.
 
 
 
