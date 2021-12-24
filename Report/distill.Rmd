@@ -146,7 +146,7 @@ data = read.csv("../Data/aircrafts_occurrences_merged.csv")
 ```{r,include=FALSE}
 #dealing with the NA
 data_na_count<-data
-data_na_count <- subset( data_na_count, select = -c("occurrence_day", "publication_day"  ) )
+data_na_count <- subset(data_na_count, select = -c(occurrence_day, publication_day))
 data_na_count[data_na_count == "****"] <- NA
 na_count <-sapply(data_na_count, function(y) sum(length(which(is.na(y)))))
 na_count
@@ -244,7 +244,7 @@ Concerning the damage, 72.6% of crashes were classified as $accident$ and the re
 hist(data$fatalities_amount, breaks=50, main= "Distribution of fatalities", xlab="fatalities")
 ```
 
-In Figure \@ref(fig:distFat) is displayed the number of fatalities. It can be seen that most of the crashes involve less than 20 deaths. The deadliest crash happened to regularly scheduled domestic passenger flight from Porto Alegre São Paulo in 1999 where 199 lost their life during landing. The Airbus A320-233 executing the flight overran runway 35L at São Paulo during moderate rain and crashed into a nearby TAM Express warehouse adjacent to a Shell filling station. The plane exploded on impact, killing all 187 passengers and crew and 12 people on the ground [@deadlycrash].
+In Figure \@ref(fig:distFat) is displayed the number of fatalities. It can be seen that most of the crashes involve less than 20 deaths. The deadliest crash happened to regularly scheduled domestic passenger flight from Porto Alegre São Paulo in 2007 where 199 lost their life during landing. The Airbus A320-233 executing the flight overran runway 35L at São Paulo during moderate rain and crashed into a nearby TAM Express warehouse adjacent to a Shell filling station. The plane exploded on impact, killing all 187 passengers and crew and 12 people on the ground [@deadlycrash].
 
 ```{r, include=FALSE}
 table(data$investigation_status)/2043
@@ -1000,13 +1000,13 @@ plot(mylogit, which = 4, id.n = 3)
 In the Cook's distance in Figure \@ref(fig:cook), outliers in the dataset are presented and the 3 largest distance values are labelled which require us to further explore them.
 
 
-```{r extreme1, echo = FALSE}
+```{r extreme1, fig.cap= "TELL SMTG ...", echo = FALSE}
 model.data <- augment(mylogit) %>% 
   mutate(index = 1:n()) 
 model.data %>% top_n(3, .cooksd)
 ```
 
-The three most extreme observations are shown in Figure \@ref(fig:extreme1).
+The three most extreme observations are shown above.
 
 
 ```{r extreme2, fig.cap = "Plot out the standard residuals", echo = FALSE}
@@ -1032,7 +1032,7 @@ include_graphics("pca.png")
 ```
 
 
-The result of PCA  in Figure \@ref(fig:pca) shows that when we keep 7 dimensions, only around 40% of variance will be captured and the curse of dimensionality might still exist. Hence it is not sensible to continue the investigation by performing clustering. Also, the DBSCAN does not give a good result on it hence not included.
+The result of PCA in Figure \@ref(fig:pca) shows that when we keep 7 dimensions, only around 40% of variance will be captured and the curse of dimensionality might still exist. Hence it is not sensible to continue the investigation by performing clustering. Also, the DBSCAN does not give a good result on it hence not included.
 
 
 ## Conclusion
