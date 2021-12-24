@@ -145,7 +145,10 @@ data = read.csv("../Data/aircrafts_occurrences_merged.csv")
 
 ```{r,include=FALSE}
 #dealing with the NA
-na_count <-sapply(data, function(y) sum(length(which(is.na(y)))))
+data_na_count<-data
+data_na_count <- subset( data_na_count, select = -c("occurrence_day", "publication_day"  ) )
+data_na_count[data_na_count == "****"] <- NA
+na_count <-sapply(data_na_count, function(y) sum(length(which(is.na(y)))))
 na_count
 ```
 
@@ -157,7 +160,7 @@ data_wo_na=drop_na(data)
 stargazer(na_count, flip=TRUE, type = "html", title = "Table 1: Repartition of NAs in the columns")
 ```
 
-The dataset contains variables with numerous missing values. Normally, we will not need them. Table 1 displays the number of missing values in each column. $Takeoff$ is the top column containing NAs, with more than 87.4% of the data missing. We see also a significant number of missing data points in the columns related to the report such as $report\_number$ with more than 78.6%, $published\_report$, $publication\_day$ and $publication\_Week$ with 51%. We can see that the data is most present for columns containing information that are independent of the accident such as $aircraft\_id$, $manufacturer$ and $type\_operation$.
+The dataset contains variables with numerous missing values. Normally, we will not need them. Table 1 displays the number of missing values in each column. $Takeoff$ is the top column containing NAs, with more than 87.4% of the data missing. We see also a significant number of missing data points in the column $fatalaties\_amount$  with 82.6% and the columns related to the report such as $report\_number$ with more than 78.6%, $published\_report$ with 51%. We can see that the data is most present for columns containing information that are independent of the accident such as $aircraft\_id$, $manufacturer$ and $type\_operation$.
 
 ```{r, include=FALSE}
 table(data["equipment"])/(2043-1)
@@ -200,7 +203,7 @@ hist(data_weight_no_zero$takeoff_max_weight..Lbs., main="Distribution of take of
 max(data_weight_no_zero$takeoff_max_weight..Lbs.)
 ```
 
-Figure \@ref(fig:distWeight) shows the distribution of takeoff max weight (in Lbs). It can be seen that that the mean weight is of 11'919.2 Lbs (5406.4 Kg). There are though very strong outliers with aircrafts having set their maximum weight at 630'499 Lbs (285'989.5 Kg).
+Figure \@ref(fig:distWeight) shows the distribution of takeoff max weight (in Lbs). It can be seen that that the mean weight is of 11,919.2 Lbs (5406.4 Kg). There are though very strong outliers with aircrafts having set their maximum weight at 630,499 Lbs (285,989.5 Kg).
 
 ```{r distManYear,fig.cap="Distribution of manufacturing year",echo=FALSE}
 data_year_no_zero=data
@@ -241,7 +244,7 @@ Concerning the damage, 72.6% of crashes were classified as $accident$ and the re
 hist(data$fatalities_amount, breaks=50, main= "Distribution of fatalities", xlab="fatalities")
 ```
 
-In Figure \@ref(fig:distFat) is displayed the number of fatalities. It can be seen that most of the crashes involve less than 20 deaths. The deadliest crash was in a private helicopter in 1999 in São Paulo where 199 lost their life during landing.
+In Figure \@ref(fig:distFat) is displayed the number of fatalities. It can be seen that most of the crashes involve less than 20 deaths. The deadliest crash happened to regularly scheduled domestic passenger flight from Porto Alegre São Paulo in 1999 where 199 lost their life during landing. The Airbus A320-233 executing the flight overran runway 35L at São Paulo during moderate rain and crashed into a nearby TAM Express warehouse adjacent to a Shell filling station. The plane exploded on impact, killing all 187 passengers and crew and 12 people on the ground [@deadlycrash].
 
 ```{r, include=FALSE}
 table(data$investigation_status)/2043
@@ -442,7 +445,8 @@ In Figure \@ref(fig:hourAccid) are displayed the distribution of accidents throu
 hist(data$occurrence_day,main="Distribution of accidents throughout days",xlab="Days",breaks='months')
 ```
 
-In Figure \@ref(fig:timeAccid) are displayed the distribution of accidents throughout days. We observe that there is an increasing trend.
+ 
+Figure \@ref(fig:timeAccid) shows the distribution of accidents over time. We can see an increasing trend, which may be due to the growth of the air transport market and the development of aircraft. We can also observe a seasonal trend in the graph, which may be due to the fact that there are usually more flights during the summer. 
 
 ```{r, include=FALSE}
 Time_Occurence_publication=data$publication_day-data$occurrence_day
