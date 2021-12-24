@@ -982,7 +982,7 @@ As shown in Figure \@ref(fig:linear), most of variables has linearity, except th
 load("assumption.RData")
 library(stargazer)
 test<- t(myvif %>% data.frame() %>% mutate(across(where(is.numeric), ~ round(., 2))))
-stargazer(test, type = "html",flip=TRUE, title = "Table 5: VIF value for each variable")
+stargazer(test, type = "html",flip=TRUE, title = "Table 5: VIF value for each variable", digits = 2)
 ```
 
 To satisfy collinearity assumption, we make sure all VIF value are less than 10 in Table 5. We manually removed the variables with VIFs greater than 10 [@yc2].
