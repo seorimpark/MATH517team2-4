@@ -54,7 +54,7 @@ The main goal of this project is to answer the following question: what are the 
 
 To answer our question, we first represented the accidents by state in Brazil to visualize their distribution. To go further, we used $\textsf{R}$ packages for geocoding (data with only place names, but no geographic coordinates) to represent each accident on a map.  
 We then turned to the temporal analysis. For this, we first made a visual approach and then an analytical one through a linear, logistic and quantile regression in order to study the association between the life of the aircraft, the severity of the accident and the level of damage.
-In addition, we made pie charts to see the shares between each category of each characteristic. We also checked whether some columns were highly correlated with each other.
+In addition, we made pie charts to see the shares between each category of each characteristic. We also checked whether some columns were highly correlated with each other. To dig further, we made pie charts to see to understand the multiples causes of occurrences.
 Finally, we wanted to find a good prediction of crash severity. To do this, the categorical data were transformed into numerical data by obtaining dummy variables and we performed a decision tree and logistic regression.
 
 ## Sources of information / datasets
@@ -670,6 +670,262 @@ include_graphics("10.png")
 Figure \@ref(fig:seat) is a scatter plot of the count of the accidents of each number of available seatings. Again, we can observe that most of the accidents are from the aircrafts having the least number of available seatings.
 
 As a result, we cannot conclude on the possibility of occurrences on the features of the aircraft, but the observation made shows that most of the occurrences come from private (Figure \@ref(fig:regav) and \@ref(fig:typop)) and small (Figure \@ref(fig:max) and Figure \@ref(fig:seat)) aircrafts.
+
+### Type of occurrences : 
+
+
+```{r , include = FALSE}
+data <- read.csv("../Data/aircrafts_occurrences_merged.csv")
+names(data)
+dim(data)
+```
+
+:
+
+```{r ,fig.cap ="Distribution of the type of occurrences",echo=FALSE}
+#pie(data$type.of.occurrence)
+barplot(table(data$type.of.occurrence))
+```
+
+
+As you can see, there are a many causes of an accident to occur and working with these causes will be difficult. One idea is to divide the causes into different categories. We choose to divide into causes that occurs on the take off of the plane, during the flight, during the landing, in the ground and finally the causes that can occur in any time, that we denote unknown. 
+
+
+
+```{r, fig.cap = "Categorisation of the multiple type of occurrences",echo=FALSE}
+takeoff <- c("TIRE BURST","LOAD LAUNCH","LEAVING THE TRACK")
+during<- c("COLLISION AGAINST OBSTACLE DURING THE FLIGHT","ENGINE FAILURE DURING THE FLIGHT", "LOSS OF CONTROL IN THE AIR",
+         "FIRE DURING THE FLIGHT","METEOROLOGICAL PHENOMENOM IN THE AIR","AIR TRAFFIC","LOSS OF COMPONENT DURING THE FLIGHT",
+         "COLLISION AGAINST BIRD","ABOUT PASSENGERS/CREW DURING THE FLIGHT","AIRCRAFTS COLLISION IN THE AIR","SPATIAL UNAWARENESS",
+         "FLIGHT COMMANDS","COLLISION DURING THE FLIGHT AGAINST TOWED OBJECT","AIRCRAFT HIT BY OBJECT")
+landing <-c("ABOUT LANDING GEAR","LANDING ON UNPREDICTABLE PLACE","EXPLOSIVE / NOT INTENTIONAL DECOMPRESSION","HARD LANDING","SLOW LANDING",
+           "LANDING WITHOUT LANDING GEAR" ,"LANDING BEFORE THE TRACK AREA")
+ground <-c("METEOROLOGICAL PHENOMENOM ON THE GROUND","COLLISION AGAINST OBSTACLE ON THE GROUND","LOSS OF CONTROL ON THE GROUND",
+           "FIRE ON THE GROUND","COMPONENT LOSS ON THE GROUND","ENGINE FAILURE IN THE GROUND","VEHICLE COLLISION AGAINST AIRCRAFT",
+           "TERRAIN COLLISION")
+unknown<- c("ABOUT ROTOR","FOD - DAMAGE CAUSED BY UNKNOWN OBJECT","SMOKE IN THE CABIN","LOW ALTITUDE MANEUVERS" ,"STRUCTURAL FAILURE",
+                "UNKNOWN","SYSTEM / COMPONENT FAILURE","ANOTHER TYPES","INVOLUNTARY ENGINE CUT OFF","ABOUT PROPELLER","FLUID LEAKS",
+                "FUEL STARVATION","PHYSIOLOGICAL PROBLEMS","TRACK INCURSION","ABOUT WINDOWS / DOORS / WINDSHIELD")
+
+data_takeoff <- data[data$type.of.occurrence %in% takeoff,]
+data_during <- data[data$type.of.occurrence %in% during,]
+data_landing <- data[data$type.of.occurrence %in% landing,]
+data_ground <- data[data$type.of.occurrence %in% ground,]
+data_unknown <- data[data$type.of.occurrence %in% unknown,]
+
+incident <- c("take off", "during the flight", "landing", "on the ground", "unknown")
+dimension<- c(nrow(data_takeoff),nrow(data_during),nrow(data_landing),nrow(data_ground),nrow(data_unknown)) 
+proportions <- data.frame(incident, dimension)
+pie(proportions$dimension, labels = proportions$incident)
+```
+
+
+
+As you can see, most of the occurrences occurs during the flight. Surprisingly, there are a lot of occurences that occurs on the ground and a negligeable amount that occurs during the take off. 
+Now we will study the severity of the accident depending on the causes. To do so we have two columns that we focus on : the classification of the accident if it was an incident or a serious accident and the damage level on the plane. 
+First, let's see how the classification can vary depending on the type of occurrences. An accident is an occurrence where the flight has been stopped, a serious incident is an incident that involved circumstances that indicate a high probability of an accident. 
+
+
+
+```{r ,fig.cap = "Proportion of the classifcation depending on the type of occurrences  ", echo=FALSE}
+par(mfrow=c(2,3))
+nb_accident = nrow (data_takeoff[data_takeoff$classification == "ACCIDENT",])
+nb_serious = nrow (data_takeoff[data_takeoff$classification=="SERIOUS INCIDENT",])
+takeoffserverity = data.frame (c(nb_accident,nb_serious), c("ACCIDENT", "SERIOUS INCIDENT"))
+label = c (nb_accident/(nb_accident+nb_serious)*100, nb_serious/(nb_accident+nb_serious)*100)
+pie (takeoffserverity$c.nb_accident..nb_serious., labels = paste(round (label), "%", sep = ""), main = "Take off")
+
+nb_accident = nrow (data_during[data_during$classification == "ACCIDENT",])
+nb_serious = nrow (data_during[data_during$classification=="SERIOUS INCIDENT",])
+takeoffserverity = data.frame (c(nb_accident,nb_serious), c("ACCIDENT", "SERIOUS INCIDENT"))
+label = c (nb_accident/(nb_accident+nb_serious)*100, nb_serious/(nb_accident+nb_serious)*100)
+pie (takeoffserverity$c.nb_accident..nb_serious., labels = paste(round(label), "%", sep = ""),  main = "During the flight")
+
+nb_accident = nrow (data_landing[data_landing$classification == "ACCIDENT",])
+nb_serious = nrow (data_landing[data_landing$classification=="SERIOUS INCIDENT",])
+takeoffserverity = data.frame (c(nb_accident,nb_serious), c("ACCIDENT", "SERIOUS INCIDENT"))
+label = c (nb_accident/(nb_accident+nb_serious)*100, nb_serious/(nb_accident+nb_serious)*100)
+pie (takeoffserverity$c.nb_accident..nb_serious., labels = paste(round(label), "%", sep = ""), main = "Landing" )
+
+nb_accident = nrow (data_ground[data_ground$classification == "ACCIDENT",])
+nb_serious = nrow (data_ground[data_ground$classification=="SERIOUS INCIDENT",])
+takeoffserverity = data.frame (c(nb_accident,nb_serious), c("ACCIDENT", "SERIOUS INCIDENT"))
+label = c (nb_accident/(nb_accident+nb_serious)*100, nb_serious/(nb_accident+nb_serious)*100)
+pie (takeoffserverity$c.nb_accident..nb_serious., labels = paste(round(label), "%", sep = ""), main = "On the ground")
+
+nb_accident = nrow (data_unknown[data_unknown$classification == "ACCIDENT",])
+nb_serious = nrow (data_unknown[data_unknown$classification=="SERIOUS INCIDENT",])
+takeoffserverity = data.frame (c(nb_accident,nb_serious), c("ACCIDENT", "SERIOUS INCIDENT"))
+label = c (nb_accident/(nb_accident+nb_serious)*100, nb_serious/(nb_accident+nb_serious)*100)
+pie (takeoffserverity$c.nb_accident..nb_serious., labels = paste(round(label), "%", sep = ""), main = "Any time during the flight")
+pie (c(1,0))
+legend("right", legend = c("Accident", "Serious Incident"), fill = c("white", "cadetblue3"),title = "Classification", cex = 1.5)
+```
+
+
+In most cases, most of the occurrences that happens are accidents. For the occurrences that happens during the landing, there are at 53% serious incident. To summarize we are going to plot the proportions of occurrences for each classification. 
+
+
+comment...
+```{r ,fig.cap = "Proportion of types of occurences for each classifcation ", echo=FALSE}
+
+par(mfrow=c(1,2))
+data_accident = data[data$classification == "ACCIDENT",]
+data_serious = data[data$classification == "SERIOUS INCIDENT",]
+
+data_accident_takeoff=data_accident[data_accident$type.of.occurrence %in% takeoff,]
+data_accident_during =data_accident[data_accident$type.of.occurrence %in% during,]
+data_accident_landing=data_accident[data_accident$type.of.occurrence %in% landing,]
+data_accident_ground=data_accident[data_accident$type.of.occurrence %in% ground,]
+data_accident_unknown = data_accident[data_accident$type.of.occurrence %in% unknown,] 
+
+incident <- c("take off", "during the flight", "landing", "on the ground", "unknown")
+dimension<- c(nrow(data_accident_takeoff),nrow(data_accident_during),nrow(data_accident_landing),nrow(data_accident_ground)
+              ,nrow(data_accident_unknown)) 
+proportions <- data.frame(incident, dimension)
+pie(proportions$dimension, labels = incident, main = "Accident")
+
+data_serious_takeoff=data_serious[data_serious$type.of.occurrence %in% takeoff,]
+data_serious_during =data_serious[data_serious$type.of.occurrence %in% during,]
+data_serious_landing=data_serious[data_serious$type.of.occurrence %in% landing,]
+data_serious_ground=data_serious[data_serious$type.of.occurrence %in% ground,]
+data_serious_unknown = data_serious[data_serious$type.of.occurrence %in% unknown,] 
+
+incident <- c("take off", "during the flight", "landing", "on the ground", "unknown")
+dimension<- c(nrow(data_serious_takeoff),nrow(data_serious_during),nrow(data_serious_landing),nrow(data_serious_ground),
+              nrow(data_serious_unknown)) 
+proportions <- data.frame(incident, dimension)
+pie(proportions$dimension, labels = incident, main = "Serious Incident")
+
+```
+
+
+However, remark that the proportions of categories of serious incidents are approximately the same. For the accident, more than the half occurs during the flight. The proportion of take off is very small for both the classifications but this come from the fact that there is a samll number of  occurrences during the take off. 
+
+
+```{r ,fig.cap = "Pie Charts of the damage level depending on the classification", echo=FALSE}
+par(mfrow=c(1,2))
+serious_destroyed = data_serious[data_serious$damage_level =="DESTROYED",]
+serious_substantial = data_serious[data_serious$damage_level =="SUBSTANTIAL",]
+serious_light = data_serious[data_serious$damage_level =="LIGHT",]
+serious_none = data_serious[data_serious$damage_level == "NONE", ]
+serious_unknown= data_serious[data_serious$damage_level == "UNKNOWN",]
+
+
+incident <- c("DESTROYED", "SUBSTANTIAL", "LIGHT", "NONE", "UNKNOWN")
+dimension<- c(nrow(serious_destroyed),nrow(serious_substantial),nrow(serious_light),nrow(serious_none),
+              nrow(serious_unknown)) 
+proportions <- data.frame(incident, dimension)
+pie(proportions$dimension, labels = incident,main = "Serious Incident")
+
+
+
+accident_destroyed = data_accident[data_accident$damage_level =="DESTROYED",]
+accident_substantial = data_accident[data_accident$damage_level =="SUBSTANTIAL",]
+accident_light = data_accident[data_accident$damage_level =="LIGHT",]
+accident_none = data_accident[data_accident$damage_level == "NONE", ]
+accident_unknown= data_accident[data_accident$damage_level == "UNKNOWN",]
+
+
+incident <- c("DESTROYED", "SUBSTANTIAL", "LIGHT", "NONE", "UNKNOWN")
+dimension<- c(nrow(accident_destroyed),nrow(accident_substantial),nrow(accident_light),nrow(accident_none),
+              nrow(accident_unknown)) 
+proportions <- data.frame(incident, dimension)
+pie(proportions$dimension, labels = incident, main = "Accident")
+
+
+
+```
+ 
+ 
+ As we can see, incidents have more light or none damage and no destructive damage, where light and no damage are a small of accident's damages. We can say that accident's damages are more severe (approximetely 25% of aircrafts are destroyed during an accident compared to 0% during serious incidents). Of course, light damages occurred during accidents represent around 10% : that may be explained by accidents occurring on the ground and causing less damages. We now plot for each category, the proportion of damages. 
+ 
+ 
+ 
+```{r ,fig.cap= "Pie Charts of the damage level depending on the type of occurences", echo=FALSE}
+par(mfrow=c(2,3))
+
+nb_destroyed = nrow (data_takeoff[data_takeoff$damage_level == "DESTROYED",])
+nb_substantial = nrow (data_takeoff[data_takeoff$damage_level == "SUBSTANTIAL",])
+nb_light = nrow (data_takeoff[data_takeoff$damage_level=="LIGHT",])
+nb_none = nrow (data_takeoff[data_takeoff$damage_level=="NONE",])
+nb_unknown = nrow (data_takeoff[data_takeoff$damage_level=="UNKNOWN",])
+takeoffdamage = data.frame (c(nb_destroyed,nb_substantial,nb_light,nb_none,nb_unknown),
+                               c("DESTROYED", "SUBSTANTIAL","LIGHT","NONE","UNKNOWN"))
+label = c (nb_destroyed/(nb_destroyed+nb_substantial+nb_light+nb_none+nb_unknown)*100,
+           nb_substantial/(nb_destroyed+nb_substantial+nb_light+nb_none+nb_unknown)*100,
+           nb_light/(nb_destroyed+nb_substantial+nb_light+nb_none+nb_unknown)*100,
+           nb_none/(nb_destroyed+nb_substantial+nb_light+nb_none+nb_unknown)*100,
+           nb_unknown/(nb_destroyed+nb_substantial+nb_light+nb_none+nb_unknown)*100)
+pie (takeoffdamage$c.nb_destroyed..nb_substantial..nb_light..nb_none..nb_unknown., 
+     labels = paste(round (label), "%", sep = ""),col = rainbow(5), main = "Take off")
+
+nb_destroyed = nrow (data_during[data_during$damage_level == "DESTROYED",])
+nb_substantial = nrow (data_during[data_during$damage_level == "SUBSTANTIAL",])
+nb_light = nrow (data_during[data_during$damage_level=="LIGHT",])
+nb_none = nrow (data_during[data_during$damage_level=="NONE",])
+nb_unknown = nrow (data_during[data_during$damage_level=="UNKNOWN",])
+duringdamage = data.frame (c(nb_destroyed,nb_substantial,nb_light,nb_none,nb_unknown),
+                               c("DESTROYED", "SUBSTANTIAL","LIGHT","NONE","UNKNOWN"))
+label = c (nb_destroyed/(nb_destroyed+nb_substantial+nb_light+nb_none+nb_unknown)*100,
+           nb_substantial/(nb_destroyed+nb_substantial+nb_light+nb_none+nb_unknown)*100,
+           nb_light/(nb_destroyed+nb_substantial+nb_light+nb_none+nb_unknown)*100,
+           nb_none/(nb_destroyed+nb_substantial+nb_light+nb_none+nb_unknown)*100,
+           nb_unknown/(nb_destroyed+nb_substantial+nb_light+nb_none+nb_unknown)*100)
+pie (duringdamage$c.nb_destroyed..nb_substantial..nb_light..nb_none..nb_unknown., 
+     labels = paste(round (label), "%", sep = ""),col = rainbow(5), main = "TDuring the flight")
+
+nb_destroyed = nrow (data_landing[data_landing$damage_level == "DESTROYED",])
+nb_substantial = nrow (data_landing[data_landing$damage_level == "SUBSTANTIAL",])
+nb_light = nrow (data_landing[data_landing$damage_level=="LIGHT",])
+nb_none = nrow (data_landing[data_landing$damage_level=="NONE",])
+nb_unknown = nrow (data_landing[data_landing$damage_level=="UNKNOWN",])
+landingdamage = data.frame (c(nb_destroyed,nb_substantial,nb_light,nb_none,nb_unknown),
+                               c("DESTROYED", "SUBSTANTIAL","LIGHT","NONE","UNKNOWN"))
+label = c (nb_destroyed/(nb_destroyed+nb_substantial+nb_light+nb_none+nb_unknown)*100,
+           nb_substantial/(nb_destroyed+nb_substantial+nb_light+nb_none+nb_unknown)*100,
+           nb_light/(nb_destroyed+nb_substantial+nb_light+nb_none+nb_unknown)*100,
+           nb_none/(nb_destroyed+nb_substantial+nb_light+nb_none+nb_unknown)*100,
+           nb_unknown/(nb_destroyed+nb_substantial+nb_light+nb_none+nb_unknown)*100)
+pie (landingdamage$c.nb_destroyed..nb_substantial..nb_light..nb_none..nb_unknown., 
+     labels = paste(round (label), "%", sep = ""),col = rainbow(5), main = "Landing")
+
+nb_destroyed = nrow (data_ground[data_ground$damage_level == "DESTROYED",])
+nb_substantial = nrow (data_ground[data_ground$damage_level == "SUBSTANTIAL",])
+nb_light = nrow (data_ground[data_ground$damage_level=="LIGHT",])
+nb_none = nrow (data_ground[data_ground$damage_level=="NONE",])
+nb_unknown = nrow (data_ground[data_ground$damage_level=="UNKNOWN",])
+grounddamage = data.frame (c(nb_destroyed,nb_substantial,nb_light,nb_none,nb_unknown),
+                               c("DESTROYED", "SUBSTANTIAL","LIGHT","NONE","UNKNOWN"))
+label = c (nb_destroyed/(nb_destroyed+nb_substantial+nb_light+nb_none+nb_unknown)*100,
+           nb_substantial/(nb_destroyed+nb_substantial+nb_light+nb_none+nb_unknown)*100,
+           nb_light/(nb_destroyed+nb_substantial+nb_light+nb_none+nb_unknown)*100,
+           nb_none/(nb_destroyed+nb_substantial+nb_light+nb_none+nb_unknown)*100,
+           nb_unknown/(nb_destroyed+nb_substantial+nb_light+nb_none+nb_unknown)*100)
+pie (grounddamage$c.nb_destroyed..nb_substantial..nb_light..nb_none..nb_unknown., 
+     labels = paste(round (label), "%", sep = ""), col = rainbow(5),main = "On the ground")
+
+
+nb_destroyed = nrow (data_unknown[data_unknown$damage_level == "DESTROYED",])
+nb_substantial = nrow (data_unknown[data_unknown$damage_level == "SUBSTANTIAL",])
+nb_light = nrow (data_unknown[data_unknown$damage_level=="LIGHT",])
+nb_none = nrow (data_unknown[data_unknown$damage_level=="NONE",])
+nb_unknown = nrow (data_unknown[data_unknown$damage_level=="UNKNOWN",])
+unknowndamage = data.frame (c(nb_destroyed,nb_substantial,nb_light,nb_none,nb_unknown),
+                               c("DESTROYED", "SUBSTANTIAL","LIGHT","NONE","UNKNOWN"))
+label = c (nb_destroyed/(nb_destroyed+nb_substantial+nb_light+nb_none+nb_unknown)*100,
+           nb_substantial/(nb_destroyed+nb_substantial+nb_light+nb_none+nb_unknown)*100,
+           nb_light/(nb_destroyed+nb_substantial+nb_light+nb_none+nb_unknown)*100,
+           nb_none/(nb_destroyed+nb_substantial+nb_light+nb_none+nb_unknown)*100,
+           nb_unknown/(nb_destroyed+nb_substantial+nb_light+nb_none+nb_unknown)*100)
+pie (unknowndamage$c.nb_destroyed..nb_substantial..nb_light..nb_none..nb_unknown., 
+     labels = paste(round (label), "%", sep = ""),col = rainbow(5) ,main = "Any time during the flight")
+pie (c(1,0))
+legend("right", c("DESTROYED", "SUBSTANTIAL", "LIGHT", "NONE", "UNKNOWN"), cex = 1.5 ,fill = rainbow(5))
+```
+
+
+At any time of the flight, the damages caused are in majority substantial. The less severe damages occure during take off (30%), during landing (19%) and on the ground (15%). The aircraft has the highest probability to get destroyed (26%) if the accident happens during the flight.  So we can conclude that take off, on the ground and landing accidents are the less severe (highest probability to be a light damage or none damage and low probability to be destroyed (2% for accidents occuring during landing)).
 
 
 ## Causes of severe accidents
