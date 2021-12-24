@@ -938,7 +938,7 @@ At any time of the flight, the damages caused are in majority substantial. The l
 To predict the severe accidents vs minor incidents and analyse the possible causes, we get dummy variables for each categorical variable, e.g. when one of the operation types is INSTRUCTION, we create a new column called  `type_operation_INSTRUCTION` and give it 1 if the type is INSTRUCTION, 0 otherwise. 
 
 ### Decision Tree
-After getting dummy variables, we feed the dataset to our decision tree predictive model figure \@ref(fig:tree) and obtain the following result. 
+After getting dummy variables, we feed the dataset to our decision tree predictive model Figure \@ref(fig:tree) and obtain the following result. 
 
 ```{r tree, fig.cap="Decision tree for severity of accident", echo=FALSE}
 
@@ -946,7 +946,7 @@ include_graphics("decision_tree_depth2.svg")
 
 ```
 
-When the `engines_amount` is greater than 1.5 and the `takeoff_max_weight..Lbs.` is larger than 14770.5, the accident will be more likely to be severe.
+When the `engines_amount` is greater than 1.5 and the `takeoff_max_weight..Lbs.` is larger than 14,770.5, the accident will be more likely to be severe.
 
 ```{r cv, fig.cap="Cross validation for the optimal depth of decision tree", echo=FALSE, out.width="50%"}
 
@@ -954,7 +954,7 @@ include_graphics("cross_ validation_decision_tree.png")
 
 ```
 
-By performing cross validation, we find the depth-2 tree achieves the best mean cross-validation accuracy 74.94988 +/- 1.62372%.
+By performing cross validation, we find the depth-2 tree achieves the best mean cross-validation accuracy 74.949 +/- 1.623%.
 
 ### Logistic Regression
 
@@ -974,7 +974,7 @@ include_graphics("linearity.png")
 
 ```
 
-As shown, most of variables has linearity, except that `registration_category_PRI` and `registration_phase_RUN_AFTER_LANDING` seem to be poor at linearity and might require further data transformation.
+As shown in Figure \@ref(fig:linear), most of variables has linearity, except that `registration_category_PRI` and `registration_phase_RUN_AFTER_LANDING` seem to be poor at linearity and might require further data transformation.
 
 
 #### 2. No Multicollinearity
@@ -992,30 +992,30 @@ To satisfy collinearity assumption, we make sure all VIF value are less than 10 
 
 Here are the VIF values for each variable.
 
-```{r, outliner, fig.cap = "Check no influential observations assumption for logistic regression", echo = FALSE}
+```{r cook, fig.cap = "Check no influential observations assumption for logistic regression", echo = FALSE}
 library(broom)
 plot(mylogit, which = 4, id.n = 3)
 ```
 
-In the Cook's distance plot, outliers in the dataset are presented and the 3 largest distance values are labelled which require us to further explore them.
+In the Cook's distance in Figure \@ref(fig:cook), outliers in the dataset are presented and the 3 largest distance values are labelled which require us to further explore them.
 
 
-```{r, echo = FALSE}
+```{r extreme1, echo = FALSE}
 model.data <- augment(mylogit) %>% 
   mutate(index = 1:n()) 
 model.data %>% top_n(3, .cooksd)
 ```
 
-The three most extreme observations are shown as above.
+The three most extreme observations are shown in Figure \@ref(fig:extreme1).
 
 
-```{r,extreme, fig.cap = "Plot out the standard residuals", echo = FALSE}
+```{r extreme2, fig.cap = "Plot out the standard residuals", echo = FALSE}
 ggplot(model.data, aes(index, .std.resid)) + 
   geom_point(aes(color = classification), alpha = .5) +
   theme_bw()
 ```
 
-To filter outliners, we try searching for the points with absolute value of standard residual to be greater than 3, we find no such points in our dataset hence there is no influential observations.
+To filter outliners, we try searching for the points with absolute value of standard residual to be greater than 3. As displayed in Figure \@ref(fig:extreme2), no such points in our dataset hence there is no influential observations.
 
 #### 4. Independence of observations
 
@@ -1032,7 +1032,7 @@ include_graphics("pca.png")
 ```
 
 
-The result of PCA shows that when we keep 7 dimensions, only around 40% of variance will be captured and the curse of dimensionality might still exist. Hence it is not sensible to continue the investigation by performing clustering. Also, the DBSCAN does not give a good result on it hence not included.
+The result of PCA  in Figure \@ref(fig:pca) shows that when we keep 7 dimensions, only around 40% of variance will be captured and the curse of dimensionality might still exist. Hence it is not sensible to continue the investigation by performing clustering. Also, the DBSCAN does not give a good result on it hence not included.
 
 
 ## Conclusion
