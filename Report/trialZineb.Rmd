@@ -1,0 +1,86 @@
+---
+title: "Brazilian Aeronautics Accidents"
+description: |
+  Statistical computation and visualization (MATH-517)
+date: December 24, 2021
+author:
+- name: "Zineb AGNAOU"  
+  url: https://github.com/ZinebAg
+- name: "Fahim BECK"
+  url: https://github.com/FahimBeck
+- name: "Yiren CAO"
+  url: https://github.com/yirencao
+- name: "Matias JANVIN"
+  url: https://github.com/matiasjanvin
+- name: "Salima JAOUA"
+  url: https://github.com/salimajaoua
+- name: "Seorim PARK"
+  url: https://github.com/seorimpark
+output: distill::distill_article
+bibliography: bibliography.bib
+csl: https://raw.githubusercontent.com/citation-style-language/styles/master/apa-annotated-bibliography.csl
+nocite: '@*'
+---
+
+<div style="text-align: justify">
+<div style="text-justify: inter-word">
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(knitr.duplicate.label = "allow")
+```
+
+
+````{r packages, include=FALSE}
+library(ggplot2)
+library(geobr)
+library(tidyr)
+library(dplyr)
+library(corrplot)
+library(stargazer)
+library(cowplot)
+library(snakecase)
+library(stringi)
+library(stringr)
+library(leaflet)
+library(readr)
+library(quantreg)
+library(latex2exp)
+library(lubridate)
+library(knitr)
+````
+
+```{r,include=FALSE}
+tex2markdown <- function(texstring) {
+  writeLines(text = texstring,
+             con = myfile <- tempfile(fileext = ".tex"))
+  texfile <- pandoc(input = myfile, format = "html")
+  cat(readLines(texfile), sep = "\n")
+  unlink(c(myfile, texfile))}
+```
+
+
+## Exploratory data analysis
+```{r, include=FALSE}
+# loading the data
+#data=read.csv("~/Desktop/Github/SCV/SCV_project/MATH517team2-4/MATH517team2-4/Data/aircrafts_occurrences_merged.csv")
+data = read.csv("../Data/aircrafts_occurrences_merged.csv")
+```
+
+```{r,include=TRUE}
+#dealing with the NA
+data_na_count<-data
+data_na_count <- subset(data_na_count, select = -c(occurrence_day, publication_day))
+data_na_count[data_na_count == "****" | data_na_count == "***"|data_na_count=="UNDEFINED"] <- NA
+na_count <-sapply(data_na_count, function(y) sum(length(which(is.na(y)))))
+na_count
+```
+
+```{r,include=FALSE}
+#data_wo_na=drop_na(data)
+```
+
+```{r ,  results='asis', echo=FALSE}
+stargazer(na_count, flip=TRUE, type = "html", title = "Table 1: Repartition of NAs in the columns")
+```
+
