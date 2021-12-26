@@ -160,7 +160,7 @@ data_wo_na=drop_na(data)
 stargazer(na_count, flip=TRUE, type = "html", title = "Table 1: Repartition of NAs in the columns")
 ```
 
-The dataset contains variables with numerous missing values. Normally, we will not need them. Table 1 displays the number of missing values in each column. $Takeoff$ is the top column containing NAs, with more than 87.4% of the data missing. We see also a significant number of missing data points in the column $fatalaties\_amount$  with 82.6% and the columns related to the report such as $published\_report$ with 51%. We can see that the data is most present for columns containing information that are independent of the accident such as $aircraft\_id$, $manufacturer$ and $type\_operation$.
+The dataset contains variables with numerous missing values. Normally, we will not need them. Table 1 displays the number of missing values in each column. $Takeoff$ is the top column containing NAs, with more than 87.4% of the data missing. We see also a significant number of missing data points in the column $fatalaties\_amount$  with 82.6% and the columns related to the report such as $published\_report$ with 51%. We can see that the data is most present for columns containing information that are independent of the accident such as $aircraft\_id$, $manufacturer$ and $type\_operation$. Finally it is surprising to see that more than half of the information concerning $origin\_flight$ and $destination\_flight$ is missing. 
 
 ```{r, include=FALSE}
 table(data["equipment"])/(2043-1)
