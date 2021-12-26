@@ -457,7 +457,7 @@ Time_Occurence_publication=as.numeric(Time_Occurence_publication, units="days")
 hist(Time_Occurence_publication,main="Distribution of time difference: occurrence and publication",xlab="Number of days")
 ```
 
-In Figure \@ref(fig:Occurancepublication) is displayed the distribution of time difference in days between the occurrence day and publication day. It can be seen that most of crashes are reported the same year. The longest time difference is of 3589 days. It was for a political operation caused by a loss of control in the air in year 1986 in Brazil.
+In Figure \@ref(fig:Occurancepublication) is displayed the distribution of time difference in days between the occurrence day and publication day. It can be seen that most of crashes are reported the same year. The longest time difference is of 3589 days. It was for a political operation caused by a loss of control in the air in year 2006 in Brazil.
 
 ### Lifetime of aircraft
 
