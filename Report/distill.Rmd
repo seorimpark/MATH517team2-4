@@ -44,17 +44,17 @@ The main goal of this project is to answer the following question: what are the 
 
 - Does the age of the aircraft play a role? Are old planes more prone to accidents? 
 
-- What are the main occurrence types or causes of accidents? 
-
 - What about the characteristics of the aircraft? Do certain features of the aircraft have an influence on the occurrences?
 
-- What are the causes of severe incidents?
+- What are the main occurrence types or causes of accidents? 
+
+- What are the causes that make an accident more serious than another? 
 
 ### Approaches
 
 To answer our question, we first represented the accidents by state in Brazil to visualize their distribution. To go further, we used $\textsf{R}$ packages for geocoding (data with only place names, but no geographic coordinates) to represent each accident on a map.  
-We then turned to the temporal analysis. For this, we first made a visual approach and then an analytical one through a linear, logistic and quantile regression in order to study the association between the life of the aircraft, the severity of the accident and the level of damage.
-In addition, we made pie charts to see the shares between each category of each characteristic. We also checked whether some columns were highly correlated with each other. To dig further, we made pie charts to see to understand the multiples causes of occurrences.
+We then turned to the temporal analysis. For this, we first made a visual approach and then an analytical one through a linear, logistic and quantile regression in order to study the association between the life of the aircraft, the severity of the accident and the level of damage.  
+Moreover, we made pie charts to see the shares between each category of each characteristic. We also checked whether some columns were highly correlated with each other. To dig further, we made some additional pie charts to understand the multiple causes of occurrences.  
 Finally, we wanted to find a good prediction of crash severity. To do this, the categorical data were transformed into numerical data by obtaining dummy variables and we performed a decision tree and logistic regression.
 
 ## Sources of information / datasets
@@ -446,7 +446,7 @@ hist(data$occurrence_day,main="Distribution of accidents throughout days",xlab="
 ```
 
  
-Figure \@ref(fig:timeAccid) shows the distribution of accidents over time. We can see an increasing trend, which may be due to the growth of the air transport market and the development of aircraft. We can also observe a seasonal trend in the graph, which may be due to the fact that there are usually more flights during the summer. 
+Figure \@ref(fig:timeAccid) shows the distribution of accidents over time. We can see an increasing trend, which may be due to the growth of the air transport market and the development of aircrafts. We can also observe a seasonal trend in the graph, which may be due to the fact that there are usually more flights during the summer. 
 
 ```{r, include=FALSE}
 Time_Occurence_publication=data$publication_day-data$occurrence_day
@@ -675,8 +675,7 @@ Figure \@ref(fig:seat) is a scatter plot of the count of the accidents of each n
 
 As a result, we cannot conclude on the possibility of occurrences on the features of the aircraft, but the observation made shows that most of the occurrences come from private (Figure \@ref(fig:regav) and \@ref(fig:typop)) and small (Figure \@ref(fig:max) and Figure \@ref(fig:seat)) aircrafts.
 
-### Type of occurrences : 
-
+## Type of occurrences
 
 ```{r , include = FALSE}
 data <- read.csv("../Data/aircrafts_occurrences_merged.csv")
@@ -684,7 +683,6 @@ names(data)
 dim(data)
 ```
 
-:
 
 ```{r ,fig.cap ="Distribution of the type of occurrences",echo=FALSE}
 #pie(data$type.of.occurrence)
@@ -692,9 +690,7 @@ barplot(table(data$type.of.occurrence))
 ```
 
 
-As you can see, there are a many causes of an accident to occur and working with these causes will be difficult. One idea is to divide the causes into different categories. We choose to divide into causes that occurs on the take off of the plane, during the flight, during the landing, in the ground and finally the causes that can occur in any time, that we denote unknown. 
-
-
+As you can see, there are a many causes of an accident to occur and working with these causes will be difficult. One idea is to divide the causes into different categories. We choose to divide them into causes that occur during takeoff, flight, landing or on the ground. Causes that can occur at any time will be designated as unknown. 
 
 ```{r, fig.cap = "Categorisation of the multiple type of occurrences",echo=FALSE}
 takeoff <- c("TIRE BURST","LOAD LAUNCH","LEAVING THE TRACK")
@@ -723,13 +719,10 @@ proportions <- data.frame(incident, dimension)
 pie(proportions$dimension, labels = proportions$incident)
 ```
 
+As you can see, most of the occurrences occur during the flight. Surprisingly, there are a lot of occurrences that happen on the ground and a negligible amount that occurs during takeoff. 
 
-
-As you can see, most of the occurrences occurs during the flight. Surprisingly, there are a lot of occurences that occurs on the ground and a negligeable amount that occurs during the take off. 
-Now we will study the severity of the accident depending on the causes. To do so we have two columns that we focus on : the classification of the accident if it was an incident or a serious accident and the damage level on the plane. 
-First, let's see how the classification can vary depending on the type of occurrences. An accident is an occurrence where the flight has been stopped, a serious incident is an incident that involved circumstances that indicate a high probability of an accident. 
-
-
+Now we will study the severity of the accident depending on the causes. To do so, we have two columns that we focus on: the classification of the accident (if it was a serious incident or an accident) and the damage level on the aircraft. 
+First, let us see how the classification can vary depending on the type of occurrences. An accident is an occurrence where the flight has been stopped, whereas a serious incident is an incident that involved circumstances that indicate a high probability of an accident. 
 
 ```{r ,fig.cap = "Proportion of the classifcation depending on the type of occurrences  ", echo=FALSE}
 par(mfrow=c(2,3))
@@ -766,11 +759,10 @@ pie (c(1,0))
 legend("right", legend = c("Accident", "Serious Incident"), fill = c("white", "cadetblue3"),title = "Classification", cex = 1.5)
 ```
 
-
-In most cases, most of the occurrences that happens are accidents. For the occurrences that happens during the landing, there are at 53% serious incident. To summarize we are going to plot the proportions of occurrences for each classification. 
-
+Most of the occurrences that happened are accidents. For the occurrences that happened during landing, there are at ???? 53% serious incident. To summarize we are going to plot the proportions of occurrences for each classification. 
 
 comment...
+
 ```{r ,fig.cap = "Proportion of types of occurences for each classifcation ", echo=FALSE}
 
 par(mfrow=c(1,2))
@@ -803,9 +795,7 @@ pie(proportions$dimension, labels = incident, main = "Serious Incident")
 
 ```
 
-
-However, remark that the proportions of categories of serious incidents are approximately the same. For the accident, more than the half occurs during the flight. The proportion of take off is very small for both the classifications but this come from the fact that there is a samll number of  occurrences during the take off. 
-
+However, notice that the proportions of categories of serious incidents are approximately the same. Speaking of accidents, more than half occur during the flight. The proportion of takeoff is very small for both of the classifications but this comes from the fact that there is a small number of  occurrences during takeoff. 
 
 ```{r ,fig.cap = "Pie Charts of the damage level depending on the classification", echo=FALSE}
 par(mfrow=c(1,2))
@@ -841,10 +831,7 @@ pie(proportions$dimension, labels = incident, main = "Accident")
 
 ```
  
- 
- As we can see, incidents have more light or none damage and no destructive damage, where light and no damage are a small of accident's damages. We can say that accident's damages are more severe (approximetely 25% of aircrafts are destroyed during an accident compared to 0% during serious incidents). Of course, light damages occurred during accidents represent around 10% : that may be explained by accidents occurring on the ground and causing less damages. We now plot for each category, the proportion of damages. 
- 
- 
+As we can see, incidents have more light or none damage and no destructive damage, where light and no damage are a small ???? of accident's damages. We can say that accident's (DONT USE ' FOR FORMAL ENGLISH) damages are more severe (approximately 25% of aircrafts are destroyed during an accident compared to 0% during serious incidents). Of course, light damages occurred during accidents represent around 10%: that may be explained by accidents occurring on the ground and causing less damages. We now plot for each category, the proportion of damages. 
  
 ```{r ,fig.cap= "Pie Charts of the damage level depending on the type of occurences", echo=FALSE}
 par(mfrow=c(2,3))
@@ -928,9 +915,7 @@ pie (c(1,0))
 legend("right", c("DESTROYED", "SUBSTANTIAL", "LIGHT", "NONE", "UNKNOWN"), cex = 1.5 ,fill = rainbow(5))
 ```
 
-
-At any time of the flight, the damages caused are in majority substantial. The less severe damages occure during take off (30%), during landing (19%) and on the ground (15%). The aircraft has the highest probability to get destroyed (26%) if the accident happens during the flight.  So we can conclude that take off, on the ground and landing accidents are the less severe (highest probability to be a light damage or none damage and low probability to be destroyed (2% for accidents occuring during landing)).
-
+At any time of the flight, caused damages are mainly substantial. The least serious damages occur during takeoff (30%), during landing (19%) and on the ground (15%). The aircraft has the highest probability to get destroyed (26%) if the accident happens during the flight. So we can conclude that accidents occurring during takeoff, landing and on the ground are the least serious one. This is when the probability to get away with a light damage or no damage is the highest and when the probability for the aircraft to be destroyed is the lowest (2% for accidents occurring during landing).
 
 ## Causes of severe accidents
 
