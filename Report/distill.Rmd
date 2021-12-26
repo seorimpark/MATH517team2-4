@@ -576,49 +576,49 @@ We do not find a strong association between accident severity and aircraft age w
 
 Different features of aircrafts are presented in the dataset, and some types of them might have caused the most accidents among all. An interactive plot ([link](https://aircraftaccteam2.herokuapp.com)) involving pie charts of the number of counts of different features is made to compare and determine which types of features have the most occurrences. Here are the output for variables $equipment$, $manufacturer$, $model$, $engine\_type$, $engines\_amount$, $registration\_aviation$, $operation\_phase$, $type\_operation$.
 
-```{r equip, fig.cap="The shares of accidents coming from the same type of aircraft", echo=FALSE}
+```{r equip, fig.cap="The shares of accidents coming from the same type of aircraft", echo=FALSE, out.width="100%"}
 
 include_graphics("1.png")
 
 ```
 
-```{r manu, fig.cap="The shares of accidents coming from the same manufacturer", echo=FALSE}
+```{r manu, fig.cap="The shares of accidents coming from the same manufacturer", echo=FALSE, out.width="100%"}
 
 include_graphics("2.png")
 
 ```
 
-```{r model, fig.cap="The shares of accidents coming from the same aircraft model", echo=FALSE}
+```{r model, fig.cap="The shares of accidents coming from the same aircraft model", echo=FALSE, out.width="100%"}
 
 include_graphics("3.png")
 
 ```
 
-```{r engtyp, fig.cap="The shares of accidents coming from the same type of aircraft engine", echo=FALSE}
+```{r engtyp, fig.cap="The shares of accidents coming from the same type of aircraft engine", echo=FALSE, out.width="100%"}
 
 include_graphics("4.png")
 
 ```
 
-```{r engamo, fig.cap="The shares of accidents coming from the same amount of engine", echo=FALSE}
+```{r engamo, fig.cap="The shares of accidents coming from the same amount of engine", echo=FALSE, out.width="100%"}
 
 include_graphics("5.png")
 
 ```
 
-```{r regav, fig.cap="The shares of accidents coming from the same registration of aviation ", echo=FALSE}
+```{r regav, fig.cap="The shares of accidents coming from the same registration of aviation ", echo=FALSE, out.width="100%"}
 
 include_graphics("6.png")
 
 ```
 
-```{r opphase, fig.cap="The shares of accidents coming from the same operation phase", echo=FALSE}
+```{r opphase, fig.cap="The shares of accidents coming from the same operation phase", echo=FALSE, out.width="100%"}
 
 include_graphics("7.png")
 
 ```
 
-```{r typop, fig.cap="The shares of accidents coming from the same type of operation", echo=FALSE}
+```{r typop, fig.cap="The shares of accidents coming from the same type of operation", echo=FALSE, out.width="100%"}
 
 include_graphics("8.png")
 
@@ -657,7 +657,7 @@ Table 4 shows the number of outliers computed from each pairs of columns. We can
 
 The maximum weight for the takeoff and the number of available seats of the aircrafts have also been used for the analysis. The scatter plots are made for the analysis, since we are working with categorical variables that are ordered.
 
-```{r max, fig.cap="The shares of accidents coming from the same type of operation", echo=FALSE}
+```{r max, fig.cap="The shares of accidents coming from the same type of operation", echo=FALSE, out.width="100%"}
 
 include_graphics("9.png")
 
@@ -665,7 +665,7 @@ include_graphics("9.png")
 
 Figure \@ref(fig:max) is a scatter plot of the count of the accidents of each maximum weights. We can observe that most of the accidents are from aircrafts having lower maximum weights.
 
-```{r seat, fig.cap="The shares of accidents coming from the same type of operation", echo=FALSE}
+```{r seat, fig.cap="The shares of accidents coming from the same type of operation", echo=FALSE, out.width="100%"}
 
 include_graphics("10.png")
 
