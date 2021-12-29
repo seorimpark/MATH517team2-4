@@ -684,16 +684,16 @@ dim(data)
 ```
 
 
-```{r bar ,fig.cap ="Distribution of the type of occurrences",echo=FALSE}
+```{r bar, fig.cap ="Distribution of the type of occurrences",echo=FALSE}
 #pie(data$type.of.occurrence)
 barplot(table(data$type.of.occurrence))
 ```
 
 
-In figure \@ref(fig:bar), there are a many causes of an accident to occur and working with these causes will be difficult. One idea is to divide the causes into different categories. We choose to divide them into causes that occur during takeoff, flight, landing or on the ground. Causes that can occur at any time will be designated as unknown. 
+In Figure \@ref(fig:bar), there are a many causes of an accident to occur and working with these causes will be difficult. One idea is to divide the causes into different categories. We choose to divide them into causes that occur during takeoff, flight, landing or on the ground. Causes that can occur at any time will be designated as unknown. 
 
 
-```{r, fig.cap = "Categorisation of the multiple type of occurrences",echo=FALSE}
+```{r pichart, fig.cap = "Categorisation of the multiple type of occurrences",echo=FALSE}
 takeoff <- c("TIRE BURST","LOAD LAUNCH","LEAVING THE TRACK")
 during<- c("COLLISION AGAINST OBSTACLE DURING THE FLIGHT","ENGINE FAILURE DURING THE FLIGHT", "LOSS OF CONTROL IN THE AIR",
          "FIRE DURING THE FLIGHT","METEOROLOGICAL PHENOMENOM IN THE AIR","AIR TRAFFIC","LOSS OF COMPONENT DURING THE FLIGHT",
@@ -720,12 +720,12 @@ proportions <- data.frame(incident, dimension)
 pie(proportions$dimension, labels = proportions$incident)
 ```
 
-As you can see, most of the occurrences occur during the flight. Surprisingly, there are a lot of occurrences that happen on the ground and a negligible amount that occurs during takeoff. 
+As shown in Figure \@ref(fig:pichart), most of the occurrences occur during the flight. Surprisingly, there are a lot of occurrences that happen on the ground and a negligible amount that occurs during takeoff. 
 
 Now we will study the severity of the accident depending on the causes. To do so, we have two columns that we focus on: the classification of the accident (if it was a serious incident or an accident) and the damage level on the aircraft. 
 First, let us see how the classification can vary depending on the type of occurrences. An accident is an occurrence where the flight has been stopped, whereas a serious incident is an incident that involved circumstances that indicate a high probability of an accident. 
 
-```{r ,fig.cap = "Proportion of the classifcation depending on the type of occurrences  ", echo=FALSE}
+```{r ,fig.cap = "Proportion of the classifcation depending on the type of occurrences", echo=FALSE}
 par(mfrow=c(2,3))
 nb_accident = nrow (data_takeoff[data_takeoff$classification == "ACCIDENT",])
 nb_serious = nrow (data_takeoff[data_takeoff$classification=="SERIOUS INCIDENT",])
@@ -796,7 +796,7 @@ pie(proportions$dimension, labels = incident, main = "Serious Incident")
 
 However, notice that the proportions of categories of serious incidents are approximately the same. Speaking of accidents, more than half occur during the flight. The proportion of takeoff is very small for both of the classifications but this comes from the fact that there is a small number of  occurrences during takeoff. 
 
-```{r ,fig.cap = "Pie Charts of the damage level depending on the classification", echo=FALSE}
+```{r pichart2,fig.cap = "Pie charts of the damage level depending on the classification", echo=FALSE}
 par(mfrow=c(1,2))
 serious_destroyed = data_serious[data_serious$damage_level =="DESTROYED",]
 serious_substantial = data_serious[data_serious$damage_level =="SUBSTANTIAL",]
@@ -830,9 +830,9 @@ pie(proportions$dimension, labels = incident, main = "Accident")
 
 ```
  
-As we can see, incidents have more light or none damage and no destructive damage, where light and no damage are a small part of  the damages that occur during an accident.Also, accident's damages are more severe (approximately 25% of aircrafts are destroyed during an accident compared to 0% during serious incidents). Of course, light damages occurred during accidents represent around 10%: that may be explained by accidents occurring on the ground and causing less damages. We now plot for each category, the proportion of damages. 
+As shown in Figure \@ref(fig:pichart2), incidents have more light or none damage and no destructive damage, where light and no damage are a small part of  the damages that occur during an accident.Also, accident's damages are more severe (approximately 25% of aircrafts are destroyed during an accident compared to 0% during serious incidents). Of course, light damages that occurred during accidents represent around 10%: that may be explained by accidents occurring on the ground and causing less damages. We now plot the proportion of damages for each category. 
  
-```{r ,fig.cap= "Pie Charts of the damage level depending on the type of occurences", echo=FALSE}
+```{r ,fig.cap= "Pie charts of the damage level depending on the type of occurences", echo=FALSE}
 par(mfrow=c(2,3))
 
 nb_destroyed = nrow (data_takeoff[data_takeoff$damage_level == "DESTROYED",])
@@ -984,14 +984,13 @@ plot(mylogit, which = 4, id.n = 3)
 In the Cook's distance in Figure \@ref(fig:cook), outliers in the dataset are presented and the 3 largest distance values are labelled which require us to further explore them.
 
 
-```{r extreme1, fig.cap= "TELL SMTG ...", echo = FALSE}
+```{r extreme1, echo = FALSE}
 model.data <- augment(mylogit) %>% 
   mutate(index = 1:n()) 
 model.data %>% top_n(3, .cooksd)
 ```
 
 The three most extreme observations are shown above.
-
 
 ```{r extreme2, fig.cap = "Plot out the standard residuals", echo = FALSE}
 ggplot(model.data, aes(index, .std.resid)) + 
